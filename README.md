@@ -144,5 +144,55 @@ Em IPv6, as ligações inter-router (`Gig0/2.102`, `Gig0/2.103`, `Gig0/2.203`) u
 
 ---
 
+## Endereçamento de Interfaces — Split
+
+> **Nota de raciocínio:** o RT1-St só tem uma ligação física de LAN (`Gig0/1`, com sub-interfaces para as VLANs 5, 6, 30, 50 e 60 — as únicas VLANs efetivamente criadas no SW1-St na Parte 5). As redes **Multimedia, Design e Communication** não correspondem a nenhuma VLAN configurada no switch, por isso são **simuladas com as interfaces `Lo0`, `Lo1` e `Lo2`** do RT1-St (técnica comum nestes labs para representar uma LAN sem hardware físico a mais). Usa-se sempre o **primeiro endereço utilizável** de cada sub-rede como gateway/IP da interface do router.
+
+### IPv4
+
+| Device | Interface | IP address | Prefixo | Description | Gateway |
+|---|---|---|---|---|---|
+| RT1-St | Gig0/1.5 | 172.20.13.225 | /29 | APs (Split) | N/A |
+| RT1-St | Gig0/1.6 | 172.20.13.233 | /29 | Management (Split) | N/A |
+| RT1-St | Gig0/1.30 | 172.20.12.1 | /25 | Staff (Split) | N/A |
+| RT1-St | Gig0/1.50 | 172.20.12.129 | /25 | Wireless-St | N/A |
+| RT1-St | Gig0/1.60 | 172.20.13.193 | /27 | Guests-St | N/A |
+| RT1-St | Gig0/2.103 | 10.0.0.6 | /30 | Connection to RT1-Zg | N/A |
+| RT1-St | Gig0/2.203 | 10.0.0.10 | /30 | Connection to RT1-Pl | N/A |
+| RT1-St | Lo0 | 172.20.13.1 | /26 | Multimedia (LAN simulada) | N/A |
+| RT1-St | Lo1 | 172.20.13.65 | /26 | Design (LAN simulada) | N/A |
+| RT1-St | Lo2 | 172.20.13.129 | /26 | Communication (LAN simulada) | N/A |
+| SW1-St | VLAN 6 | 172.20.13.234 | /29 | Management (SVI de gestão) | 172.20.13.233 |
+| AP1-St | Fa1 | 172.20.13.226 | /29 | APs | 172.20.13.225 |
+| PCD | — | (via DHCP) | /25 | Host com fios em Staff | 172.20.12.1 |
+
+### IPv6
+
+| Device | Interface | IP address | Prefixo | Description | Gateway |
+|---|---|---|---|---|---|
+| RT1-St | Gig0/1.5 | 2001:C:0:6::1 | /64 | APs (Split) | N/A |
+| RT1-St | Gig0/1.6 | 2001:C:0:7::1 | /64 | Management (Split) | N/A |
+| RT1-St | Gig0/1.30 | 2001:C::1 | /64 | Staff (Split) | N/A |
+| RT1-St | Gig0/1.50 | 2001:C:0:1::1 | /64 | Wireless-St | N/A |
+| RT1-St | Gig0/1.60 | 2001:C:0:5::1 | /64 | Guests-St | N/A |
+| RT1-St | Gig0/2.103 | link-local (ex: `FE80::103`) | /64 | Connection to RT1-Zg | N/A |
+| RT1-St | Gig0/2.203 | link-local (ex: `FE80::203ST`) | /64 | Connection to RT1-Pl | N/A |
+| RT1-St | Lo0 | 2001:C:0:2::1 | /64 | Multimedia (LAN simulada) | N/A |
+| RT1-St | Lo1 | 2001:C:0:3::1 | /64 | Design (LAN simulada) | N/A |
+| RT1-St | Lo2 | 2001:C:0:4::1 | /64 | Communication (LAN simulada) | N/A |
+| SW1-St | VLAN 6 | 2001:C:0:7::2 | /64 | Management (SVI de gestão) | 2001:C:0:7::1 |
+| AP1-St | Fa1 | 2001:C:0:6::2 | /64 | APs | 2001:C:0:6::1 |
+| PCD | — | (via SLAAC/DHCPv6) | /64 | Host com fios em Staff | 2001:C::1 |
+
+> Todas as interfaces devem também ficar com um endereço **link-local** próprio (obrigatório pela Parte 6d), gerado automaticamente ou definido à mão — os exemplos de `FE80::` acima são apenas ilustrativos.
+
+### Notas importantes
+- Em cada sub-rede, o **primeiro endereço utilizável** é normalmente atribuído ao gateway (interface/sub-interface do router, já que Split não tem MLS).
+- Split não tem HSRP (só existe em Zagreb), por isso cada rede leva apenas **1 endereço de gateway**, não 3 como em Zagreb.
+- As sub-redes "Free Space" ficam de reserva para expansão futura.
+- Nos pontos-a-ponto (WAN entre routers), o IPv6 fica marcado como link-local por não haver requisito de endereço global nesses troços.
+
+---
+
 ## Autores
 Grupo 134 — ISEP
