@@ -2,7 +2,7 @@
 
 Projeto CCNAv7 SRWE Final Exam — ISEP Academy.
 
-Documento de referência com o esquema de endereçamento IP (IPv4/IPv6) usado na topologia (Zagreb, Pula e Split).
+Documento de referência com o esquema de endereçamento IP (IPv4/IPv6) usado na topologia (Zagreb, Pula e Split), e os comandos de configuração inicial dos equipamentos.
 
 ## Índice
 - [Blocos de partida](#blocos-de-partida)
@@ -12,6 +12,8 @@ Documento de referência com o esquema de endereçamento IP (IPv4/IPv6) usado na
 - [Ligações WAN entre routers](#ligações-wan-entre-routers-ipv4)
 - [Endereçamento de Interfaces — Pula](#endereçamento-de-interfaces--pula)
 - [Endereçamento de Interfaces — Split](#endereçamento-de-interfaces--split)
+- [Part 2 — Clear Configs and Reload](#part-2--clear-configs-and-reload-the-equipment)
+- [Part 3 — Initial Configuration](#part-3--perform-equipment-initial-configuration)
 
 ---
 
@@ -193,6 +195,56 @@ Em IPv6, as ligações inter-router (`Gig0/2.102`, `Gig0/2.103`, `Gig0/2.203`) u
 - As sub-redes "Free Space" ficam de reserva para expansão futura.
 - Nos pontos-a-ponto (WAN entre routers), o IPv6 fica marcado como link-local por não haver requisito de endereço global nesses troços.
 
+---
+
+## Part 2 — Clear Configs and Reload the Equipment
+
+| Task | IOS Command |
+|---|---|
+| Erase the startup-config file on the Routers | `erase startup-config` |
+| Reload the Routers | `reload` |
+| Erase the startup-config file on the Switches | `erase startup-config` |
+| Delete the vlan.dat file on the Switches | `delete vlan.dat` |
+| Reload the Switches | `reload` |
+| Verify the Switches SDM Template | `sdm prefer dual-ipv4-and-ipv6 default` (requer reload) |
+| Clear the WLC Config | Menu de boot (ESC) → opção **5. Clear Configuration** |
+| Clear the APs Config | Premir o botão **MODE** ~30s durante o arranque |
+
+**Notas:**
+- O `delete vlan.dat` é exclusivo dos switches — o `erase startup-config` não apaga a base de dados de VLANs, que fica guardada à parte na flash.
+- O comando `sdm prefer dual-ipv4-and-ipv6 default` garante que a TCAM do switch reserva espaço suficiente para tabelas IPv6, necessário para a conectividade IPv6 pedida no Part 13. Exige **reload** para ter efeito.
+- A WLC (AireOS) e os APs não usam comandos IOS — a limpeza é feita via menu de boot / botão físico.
+
+---
+
+## Part 3 — Perform Equipment Initial Configuration
+
+Aplica-se a **todos os dispositivos intermediários** (routers, switches e MLS).
+
+enable
+configure terminal
+no ip domain-lookup
+hostname <nome>
+ip domain-name isepacademy.ccna.itn.com
+security passwords min-length 10
+service password-encryption
+enable secret classclass
+username cisco secret classclass
+crypto key generate rsa modulus 2048
+ip ssh version 2
+line console 0
+password classclass
+login
+exit
+line vty 0 15
+transport input ssh
+login local
+exec-timeout 0 30
+exit
+login block-for 300 attempts 3 within 120
+banner motd #
+AVISO: Acesso restrito a utilizadores autorizados. Todas as ligacoes sao monitorizadas e registadas. Qualquer tentativa de acesso nao autorizado sera reportada as autoridades competentes.
+ip hosts <prencher conforme>
 ---
 
 ## Autores
