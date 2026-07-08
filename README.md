@@ -11,6 +11,7 @@ Documento de referência com o esquema de endereçamento IP (IPv4/IPv6) usado na
 - [Split](#split-1722012023-2001c61)
 - [Ligações WAN entre routers](#ligações-wan-entre-routers-ipv4)
 - [Endereçamento de Interfaces — Pula](#endereçamento-de-interfaces--pula)
+- [Endereçamento de Interfaces — Split](#endereçamento-de-interfaces--split)
 
 ---
 
