@@ -368,6 +368,123 @@ exit
 end 
 write memory
 
+parte 6
+
+Router
+
+enable
+configure terminal
+
+ipv6 unicast-routing
+interface GigabitEthernet0/1
+ description Link to SW1-St (LAN VLANs)
+ no ip address
+ no shutdown
+exit
+
+interface GigabitEthernet0/1.5
+ description APs (Split)
+ encapsulation dot1Q 5
+ ip address 172.20.13.225 255.255.255.248
+ ipv6 address 2001:C:0:6::1/64
+ ipv6 address FE80::1 link-local
+ ipv6 enable
+exit
+
+interface GigabitEthernet0/1.6
+ description Management (Split)
+ encapsulation dot1Q 6
+ ip address 172.20.13.233 255.255.255.248
+ ipv6 address 2001:C:0:7::1/64
+ ipv6 address FE80::1 link-local
+ ipv6 enable
+exit
+
+interface GigabitEthernet0/1.30
+ description Staff (Split)
+ encapsulation dot1Q 30
+ ip address 172.20.12.1 255.255.255.128
+ ipv6 address 2001:C::1/64
+ ipv6 address FE80::1 link-local
+ ipv6 enable
+exit
+
+interface GigabitEthernet0/1.50
+ description Wireless-St
+ encapsulation dot1Q 50
+ ip address 172.20.12.129 255.255.255.128
+ ipv6 address 2001:C:0:1::1/64
+ ipv6 address FE80::1 link-local
+ ipv6 enable
+exit
+
+interface GigabitEthernet0/1.60
+ description Guests-St
+ encapsulation dot1Q 60
+ ip address 172.20.13.193 255.255.255.224
+ ipv6 address 2001:C:0:5::1/64
+ ipv6 address FE80::1 link-local
+ ipv6 enable
+exit
+
+interface GigabitEthernet0/2
+ no ip address
+ no shutdown
+exit
+
+interface GigabitEthernet0/2.103
+ description Connection to RT1-Zg
+ encapsulation dot1Q 103
+ ip address 10.0.0.6 255.255.255.252
+ ipv6 address FE80::103 link-local
+ ipv6 enable
+exit
+
+interface GigabitEthernet0/2.203
+ description Connection to RT1-Pl
+ encapsulation dot1Q 203
+ ip address 10.0.0.10 255.255.255.252
+ ipv6 address FE80::203 link-local
+ ipv6 enable
+exit
+
+interface Loopback0
+ description Multimedia (LAN simulada)
+ ip address 172.20.13.1 255.255.255.192
+ ipv6 address 2001:C:0:2::1/64
+exit
+
+interface Loopback1
+ description Design (LAN simulada)
+ ip address 172.20.13.65 255.255.255.192
+ ipv6 address 2001:C:0:3::1/64
+exit
+
+interface Loopback2
+ description Communication (LAN simulada)
+ ip address 172.20.13.129 255.255.255.192
+ ipv6 address 2001:C:0:4::1/64
+exit
+
+Switch
+
+enable
+configure terminal
+
+interface Vlan6
+ description Management SVI
+ ip address 172.20.13.234 255.255.255.248
+ ipv6 address 2001:C:0:7::2/64
+ ipv6 address FE80::2 link-local
+ ipv6 enable
+ no shutdown
+exit
+ip default-gateway 172.20.13.233
+ipv6 route ::/0 FE80::1 Vlan6
+end
+copy running-config startup-config
+
+
 ---
 
 ## Autores
