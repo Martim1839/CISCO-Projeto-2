@@ -197,6 +197,98 @@ Em IPv6, as ligações inter-router (`Gig0/2.102`, `Gig0/2.103`, `Gig0/2.203`) u
 
 ---
 
+## Endereçamento de Interfaces — Zagreb
+
+> **Nota de raciocínio:** O bloco de Zagreb é gerido com duas Multilayer Switches (MLS1-Zg e MLS2-Zg) a fazerem encaminhamento e redundância através de HSRP. O gateway virtual (vIP) de cada VLAN será o `.3` em IPv4 e o `::3` em IPv6. Adicionalmente, os links P2P utilizam apenas endereços link-local (FE80::) em IPv6.
+
+### IPv4
+
+| Device | Interface | IP address | Prefixo | Description | Gateway |
+|---|---|---|---|---|---|
+| RT1-Zg | Gig0/0 | 172.20.7.97 | /30 | Connection to MLS1 | N/A |
+| RT1-Zg | Gig0/1 | 172.20.7.101 | /30 | Connection to MLS2 | N/A |
+| RT1-Zg | Gig0/2.102 | 10.0.0.1 | /30 | Connection to RT1-Pl | N/A |
+| RT1-Zg | Gig0/2.103 | 10.0.0.5 | /30 | Connection to RT1-St | N/A |
+| SW1-Zg | VLAN 6 | 172.20.7.4 | /27 | Management (SW1) | 172.20.7.3 |
+| SW2-Zg | VLAN 6 | 172.20.7.5 | /27 | Management (SW2) | 172.20.7.3 |
+| MLS1-Zg | Gig0/1 | 172.20.7.98 | /30 | Connection to RT1-Zg | N/A |
+| MLS1-Zg | VLAN 5 | 172.20.7.65 | /27 | APs | N/A |
+| MLS1-Zg | VLAN 6 | 172.20.7.1 | /27 | Management | N/A |
+| MLS1-Zg | VLAN 10 | 172.20.7.33 | /27 | Servers | N/A |
+| MLS1-Zg | VLAN 20 | 172.20.0.1 | /24 | Administration | N/A |
+| MLS1-Zg | VLAN 30 | 172.20.1.1 | /24 | Staff | N/A |
+| MLS1-Zg | VLAN 40 | 172.20.2.1 | /23 | VoIP | N/A |
+| MLS1-Zg | VLAN 50 | 172.20.4.1 | /23 | Wireless | N/A |
+| MLS1-Zg | VLAN 60 | 172.20.6.1 | /24 | Guests | N/A |
+| MLS2-Zg | Gig0/1 | 172.20.7.102 | /30 | Connection to RT1-Zg | N/A |
+| MLS2-Zg | VLAN 5 | 172.20.7.66 | /27 | APs | N/A |
+| MLS2-Zg | VLAN 6 | 172.20.7.2 | /27 | Management | N/A |
+| MLS2-Zg | VLAN 10 | 172.20.7.34 | /27 | Servers | N/A |
+| MLS2-Zg | VLAN 20 | 172.20.0.2 | /24 | Administration | N/A |
+| MLS2-Zg | VLAN 30 | 172.20.1.2 | /24 | Staff | N/A |
+| MLS2-Zg | VLAN 40 | 172.20.2.2 | /23 | VoIP | N/A |
+| MLS2-Zg | VLAN 50 | 172.20.4.2 | /23 | Wireless | N/A |
+| MLS2-Zg | VLAN 60 | 172.20.6.2 | /24 | Guests | N/A |
+| MLS1/MLS2-Zg | VLAN 5 VIP | 172.20.7.67 | /27 | VIP APs | N/A |
+| MLS1/MLS2-Zg | VLAN 6 VIP | 172.20.7.3 | /27 | VIP Management | N/A |
+| MLS1/MLS2-Zg | VLAN 10 VIP | 172.20.7.35 | /27 | VIP Servers | N/A |
+| MLS1/MLS2-Zg | VLAN 20 VIP | 172.20.0.3 | /24 | VIP Administration | N/A |
+| MLS1/MLS2-Zg | VLAN 30 VIP | 172.20.1.3 | /24 | VIP Staff | N/A |
+| MLS1/MLS2-Zg | VLAN 40 VIP | 172.20.2.3 | /23 | VIP VoIP | N/A |
+| MLS1/MLS2-Zg | VLAN 50 VIP | 172.20.4.3 | /23 | VIP Wireless | N/A |
+| MLS1/MLS2-Zg | VLAN 60 VIP | 172.20.6.3 | /24 | VIP Guests | N/A |
+| WLC1-Zg | Management | 172.20.7.6 | /27 | Management | 172.20.7.3 |
+| WLC1-Zg | wireless-zg | 172.20.4.4 | /23 | Wireless | 172.20.4.3 |
+| WLC1-Zg | guest-zg | 172.20.6.4 | /24 | Guests | 172.20.6.3 |
+| AP1-Zg | Fa1 | 172.20.7.68 | /27 | APs | 172.20.7.67 |
+| PCA | N/A | 172.20.0.4 | /24 | Host com fios em Admin | 172.20.0.3 |
+| PCB | N/A | 172.20.1.4 | /24 | Host com fios em Staff | 172.20.1.3 |
+| DHCP-SRV | N/A | 172.20.7.36 | /27 | DHCP Server | 172.20.7.35 |
+
+### IPv6
+
+| Device | Interface | IP address | Prefixo | Description | Gateway |
+|---|---|---|---|---|---|
+| RT1-Zg | Gig0/0 | FE80::1 | link-local | IPv6 link-local | N/A |
+| RT1-Zg | Gig0/1 | FE80::1 | link-local | IPv6 link-local | N/A |
+| RT1-Zg | Gig0/2.102 | FE80::1 | link-local | Connection to RT1-Pl | N/A |
+| RT1-Zg | Gig0/2.103 | FE80::1 | link-local | Connection to RT1-St | N/A |
+| SW1-Zg | VLAN 6 | 2001:A:0:5::4 | /64 | Management (SW1) | 2001:A:0:5::3 |
+| SW2-Zg | VLAN 6 | 2001:A:0:5::5 | /64 | Management (SW2) | 2001:A:0:5::3 |
+| MLS1-Zg | Gig0/1 | FE80::2 | link-local | IPv6 link-local | N/A |
+| MLS1-Zg | VLAN 5 | 2001:A:0:7::1 | /64 | APs | N/A |
+| MLS1-Zg | VLAN 6 | 2001:A:0:5::1 | /64 | Management | N/A |
+| MLS1-Zg | VLAN 10 | 2001:A:0:6::1 | /64 | Servers | N/A |
+| MLS1-Zg | VLAN 20 | 2001:A:0:0::1 | /64 | Administration | N/A |
+| MLS1-Zg | VLAN 30 | 2001:A:0:1::1 | /64 | Staff | N/A |
+| MLS1-Zg | VLAN 40 | 2001:A:0:2::1 | /64 | VoIP | N/A |
+| MLS1-Zg | VLAN 50 | 2001:A:0:3::1 | /64 | Wireless | N/A |
+| MLS1-Zg | VLAN 60 | 2001:A:0:4::1 | /64 | Guests | N/A |
+| MLS2-Zg | Gig0/1 | FE80::3 | link-local | IPv6 link-local | N/A |
+| MLS2-Zg | VLAN 5 | 2001:A:0:7::2 | /64 | APs | N/A |
+| MLS2-Zg | VLAN 6 | 2001:A:0:5::2 | /64 | Management | N/A |
+| MLS2-Zg | VLAN 10 | 2001:A:0:6::2 | /64 | Servers | N/A |
+| MLS2-Zg | VLAN 20 | 2001:A:0:0::2 | /64 | Administration | N/A |
+| MLS2-Zg | VLAN 30 | 2001:A:0:1::2 | /64 | Staff | N/A |
+| MLS2-Zg | VLAN 40 | 2001:A:0:2::2 | /64 | VoIP | N/A |
+| MLS2-Zg | VLAN 50 | 2001:A:0:3::2 | /64 | Wireless | N/A |
+| MLS2-Zg | VLAN 60 | 2001:A:0:4::2 | /64 | Guests | N/A |
+| MLS1/MLS2-Zg | VLAN 5 VIP | 2001:A:0:7::3 | /64 | VIP APs | N/A |
+| MLS1/MLS2-Zg | VLAN 6 VIP | 2001:A:0:5::3 | /64 | VIP Management | N/A |
+| MLS1/MLS2-Zg | VLAN 10 VIP | 2001:A:0:6::3 | /64 | VIP Servers | N/A |
+| MLS1/MLS2-Zg | VLAN 20 VIP | 2001:A:0:0::3 | /64 | VIP Administration | N/A |
+| MLS1/MLS2-Zg | VLAN 30 VIP | 2001:A:0:1::3 | /64 | VIP Staff | N/A |
+| MLS1/MLS2-Zg | VLAN 40 VIP | 2001:A:0:2::3 | /64 | VIP VoIP | N/A |
+| MLS1/MLS2-Zg | VLAN 50 VIP | 2001:A:0:3::3 | /64 | VIP Wireless | N/A |
+| MLS1/MLS2-Zg | VLAN 60 VIP | 2001:A:0:4::3 | /64 | VIP Guests | N/A |
+| WLC1-Zg | Management | 2001:A:0:5::6 | /64 | Management | 2001:A:0:5::3 |
+| WLC1-Zg | wireless-zg | N/A | N/A | Apenas IPv4 | N/A |
+| WLC1-Zg | guest-zg | N/A | N/A | Apenas IPv4 | N/A |
+| AP1-Zg | Fa1 | 2001:A:0:7::4 | /64 | APs | 2001:A:0:7::3 |
+| PCA | N/A | 2001:A:0:0::4 | /64 | Host com fios em Admin | 2001:A:0:0::3 |
+| PCB | N/A | 2001:A:0:1::4 | /64 | Host com fios em Staff | 2001:A:0:1::3 |
+| DHCP-SRV | N/A | 2001:A:0:6::5 | /64 | DHCP Server | 2001:A:0:6::3 |
+
 ## Part 2 — Clear Configs and Reload the Equipment
 
 | Task | IOS Command |
