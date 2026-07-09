@@ -341,5 +341,34 @@ ip hosts <prencher conforme>
 
 ---
 
+## Part 4 —  Enable EtherChannel Between MLSs
+
+MLS1-Zg
+
+enable
+configure terminal
+interface range gigabitEthernet 0/2 - 3
+ channel-group 1 mode on
+ no shutdown
+exit
+
+end 
+write memory
+
+
+MLS2-Zg
+
+enable
+configure terminal
+interface range gigabitEthernet 0/2 - 3
+ channel-group 1 mode on
+ no shutdown
+exit
+
+end 
+write memory
+
+---
+
 ## Autores
 Grupo 134 — ISEP
