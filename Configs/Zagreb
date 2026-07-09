@@ -1,4 +1,4 @@
-Part 4
+Part 3
 
 RT1-Zg
 
@@ -219,3 +219,117 @@ line vty 0 15
 exit
 end
 write
+
+
+Part 5
+
+MLS1/2
+
+enable
+configure terminal
+
+interface Port-channel 1
+ switchport mode trunk
+ switchport trunk native vlan 7
+ switchport trunk allowed vlan remove 99
+ switchport nonegotiate
+exit
+
+interface range GigabitEthernet 1/0/4 - 5
+ switchport mode trunk
+ switchport trunk native vlan 7
+ switchport trunk allowed vlan remove 99
+ switchport nonegotiate
+exit
+
+interface range GigabitEthernet 1/0/6 - 24
+ switchport mode access
+ switchport access vlan 99
+ switchport nonegotiate
+ shutdown
+exit
+
+end
+write memory
+
+
+
+SW1
+
+enable
+configure terminal
+interface range GigabitEthernet 0/1 - 2
+ switchport mode trunk
+ switchport trunk native vlan 7
+ switchport trunk allowed vlan remove 99
+ switchport nonegotiate
+exit
+interface range FastEthernet 0/1 - 5
+ switchport mode access
+ switchport access vlan 10
+ switchport nonegotiate
+exit
+interface range FastEthernet 0/6 - 13
+ switchport mode access
+ switchport access vlan 20
+ switchport voice vlan 40
+ switchport nonegotiate
+exit
+interface range FastEthernet 0/14 - 20
+ switchport mode access
+ switchport access vlan 30
+ switchport voice vlan 40
+ switchport nonegotiate
+exit
+interface range FastEthernet 0/21 - 24
+ switchport mode access
+ switchport access vlan 99
+ switchport nonegotiate
+ shutdown
+exit
+end
+write memory
+
+
+SW2
+
+enable
+configure terminal
+interface range GigabitEthernet 0/1 - 2
+ switchport mode trunk
+ switchport trunk native vlan 7
+ switchport trunk allowed vlan remove 99
+ switchport nonegotiate
+exit
+interface range FastEthernet 0/1 - 10
+ switchport mode access
+ switchport access vlan 20
+ switchport voice vlan 40
+ switchport nonegotiate
+exit
+interface range FastEthernet 0/11 - 20
+ switchport mode access
+ switchport access vlan 30
+ switchport voice vlan 40
+ switchport nonegotiate
+exit
+interface range FastEthernet 0/21 - 22
+ switchport mode trunk
+ switchport trunk native vlan 5
+ switchport trunk allowed vlan 5,50,60
+ switchport nonegotiate
+exit
+interface FastEthernet 0/23
+ switchport mode trunk
+ switchport trunk native vlan 6
+ switchport trunk allowed vlan 5,6,50,60
+ switchport nonegotiate
+exit
+interface FastEthernet 0/24
+ switchport mode access
+ switchport access vlan 99
+ switchport nonegotiate
+ shutdown
+exit
+end
+write memory
