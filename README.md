@@ -322,7 +322,8 @@ security passwords min-length 10
 service password-encryption
 enable secret classclass
 username cisco secret classclass
-crypto key generate rsa modulus 2048
+crypto key generate rsa 
+2048
 ip ssh version 2
 line console 0
 password classclass
@@ -335,8 +336,9 @@ exec-timeout 0 30
 exit
 login block-for 300 attempts 3 within 120
 banner motd #
-AVISO: Acesso restrito a utilizadores autorizados. Todas as ligacoes sao monitorizadas e registadas. Qualquer tentativa de acesso nao autorizado sera reportada as autoridades competentes.
+AVISO: Acesso restrito a utilizadores autorizados. Todas as ligacoes sao monitorizadas e registadas. Qualquer tentativa de acesso nao autorizado sera reportada as autoridades competentes. #
 ip hosts <prencher conforme>
+
 ---
 
 ## Autores
