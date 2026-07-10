@@ -531,7 +531,48 @@ f.
 interface range FastEthernet0/2 - 15
  spanning-tree bpduguard enable
 exit
+---
+Parte 11
 
+a.
+RT1-St:
+enable
+configure terminal
+ip route 172.20.0.0 255.255.248.0 10.0.0.5
+ip route 172.20.0.0 255.255.248.0 10.0.0.9 200
+ip route 172.20.8.0 255.255.252.0 10.0.0.9
+ip route 172.20.8.0 255.255.252.0 10.0.0.5 200
+ipv6 route 2001:A::/61 GigabitEthernet0/2.103 FE80::1
+ipv6 route 2001:A::/61 GigabitEthernet0/2.203 FE80::2 200
+ipv6 route 2001:B::/61 GigabitEthernet0/2.203 FE80::2
+ipv6 route 2001:B::/61 GigabitEthernet0/2.103 FE80::1 200
+end
+
+RT1-Zg:
+enable
+configure terminal
+ip route 172.20.8.0 255.255.252.0 10.0.0.2
+ip route 172.20.8.0 255.255.252.0 10.0.0.5 200
+ip route 172.20.12.0 255.255.254.0 10.0.0.5
+ip route 172.20.12.0 255.255.254.0 10.0.0.2 200
+ipv6 route 2001:B::/61 GigabitEthernet0/2.102 FE80::2
+ipv6 route 2001:B::/61 GigabitEthernet0/2.103 FE80::103 200
+ipv6 route 2001:C::/61 GigabitEthernet0/2.103 FE80::103
+ipv6 route 2001:C::/61 GigabitEthernet0/2.102 FE80::2 200
+end
+
+RT1-Pl:
+enable
+configure terminal
+ip route 172.20.0.0 255.255.248.0 10.0.0.1
+ip route 172.20.0.0 255.255.248.0 10.0.0.10 200
+ip route 172.20.12.0 255.255.254.0 10.0.0.10
+ip route 172.20.12.0 255.255.254.0 10.0.0.1 200
+ipv6 route 2001:A::/61 GigabitEthernet0/2.102 FE80::1
+ipv6 route 2001:A::/61 GigabitEthernet0/2.203 FE80::203 200
+ipv6 route 2001:C::/61 GigabitEthernet0/2.203 FE80::203
+ipv6 route 2001:C::/61 GigabitEthernet0/2.102 FE80::1 200
+end
 ---
 
 ## Autores
