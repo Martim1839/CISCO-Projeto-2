@@ -484,6 +484,53 @@ ipv6 route ::/0 FE80::1 Vlan6
 end
 copy running-config startup-config
 
+---
+
+Parte 10 - St
+a. Parte 5 verificar com
+show interfaces status | include disabled
+
+b.
+enable
+configure terminal
+interface range FastEthernet0/2 - 15
+ switchport port-security
+ switchport port-security maximum 5
+ switchport port-security violation shutdown
+ switchport port-security aging time 5
+ switchport port-security aging type inactivity
+exit
+
+c.
+ip dhcp snooping
+ip dhcp snooping vlan 30,50,60
+interface FastEthernet0/1
+ ip dhcp snooping trust
+exit
+interface range FastEthernet0/2 - 15
+ ip dhcp snooping limit rate 5
+exit
+interface range FastEthernet0/21 - 22
+ ip dhcp snooping limit rate 5
+exit
+
+d.
+ip arp inspection vlan 30
+interface FastEthernet0/1
+ ip arp inspection trust
+exit
+interface range FastEthernet0/2 - 15
+ ip arp inspection limit rate 5
+exit
+
+
+e.
+spanning-tree portfast default
+
+f.
+interface range FastEthernet0/2 - 15
+ spanning-tree bpduguard enable
+exit
 
 ---
 
