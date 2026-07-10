@@ -333,3 +333,64 @@ interface FastEthernet 0/24
 exit
 end
 write memory
+
+
+=================PART 9=====================
+MLS1
+configure terminal
+interface Vlan20
+ standby 20 ip 172.20.0.1
+ standby 20 priority 110
+ standby 20 preempt
+exit
+interface Vlan30
+ standby 30 ip 172.20.1.1
+ standby 30 priority 110
+ standby 30 preempt
+exit
+interface Vlan40
+ standby 40 ip 172.20.2.1
+ standby 40 priority 110
+ standby 40 preempt
+exit
+interface Vlan50
+ standby 50 ip 172.20.4.1
+ standby 50 priority 110
+ standby 50 preempt
+exit
+interface Vlan60
+ standby 60 ip 172.20.6.1
+ standby 60 priority 110
+ standby 60 preempt
+exit
+end
+write memory
+
+
+
+
+MLS2
+
+configure terminal
+interface Vlan20
+ standby 20 ip 172.20.0.1
+ standby 20 preempt
+exit
+interface Vlan30
+ standby 30 ip 172.20.1.1
+ standby 30 preempt
+exit
+interface Vlan40
+ standby 40 ip 172.20.2.1
+ standby 40 preempt
+exit
+interface Vlan50
+ standby 50 ip 172.20.4.1
+ standby 50 preempt
+exit
+interface Vlan60
+ standby 60 ip 172.20.6.1
+ standby 60 preempt
+exit
+end
+write memory
