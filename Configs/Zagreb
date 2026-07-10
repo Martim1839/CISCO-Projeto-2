@@ -337,32 +337,73 @@ write memory
 
 =================PART 9=====================
 MLS1
+enable
 configure terminal
+
+interface Vlan5
+ standby version 2
+ standby 5 ip 172.20.7.67
+ standby 5 ipv6 2001:A:0:7::3
+ standby 5 priority 110
+ standby 5 preempt
+exit
+
+interface Vlan6
+ standby version 2
+ standby 6 ip 172.20.7.3
+ standby 6 ipv6 2001:A:0:5::3
+ standby 6 priority 110
+ standby 6 preempt
+exit
+
+interface Vlan10
+ standby version 2
+ standby 10 ip 172.20.7.35
+ standby 10 ipv6 2001:A:0:6::3
+ standby 10 priority 110
+ standby 10 preempt
+exit
+
 interface Vlan20
- standby 20 ip 172.20.0.1
+ standby version 2
+ standby 20 ip 172.20.0.3
+ standby 20 ipv6 2001:A:0:0::3
  standby 20 priority 110
  standby 20 preempt
 exit
+
 interface Vlan30
- standby 30 ip 172.20.1.1
+ standby version 2
+ standby 30 ip 172.20.1.3
+ standby 30 ipv6 2001:A:0:1::3
  standby 30 priority 110
  standby 30 preempt
 exit
+
 interface Vlan40
- standby 40 ip 172.20.2.1
+ standby version 2
+ standby 40 ip 172.20.2.3
+ standby 40 ipv6 2001:A:0:2::3
  standby 40 priority 110
  standby 40 preempt
 exit
+
 interface Vlan50
- standby 50 ip 172.20.4.1
+ standby version 2
+ standby 50 ip 172.20.4.3
+ standby 50 ipv6 2001:A:0:3::3
  standby 50 priority 110
  standby 50 preempt
 exit
+
 interface Vlan60
- standby 60 ip 172.20.6.1
+ standby version 2
+ standby 60 ip 172.20.6.3
+ standby 60 ipv6 2001:A:0:4::3
  standby 60 priority 110
  standby 60 preempt
 exit
+
 end
 write memory
 
@@ -371,26 +412,64 @@ write memory
 
 MLS2
 
+enable
 configure terminal
+
+interface Vlan5
+ standby version 2
+ standby 5 ip 172.20.7.67
+ standby 5 ipv6 2001:A:0:7::3
+ standby 5 preempt
+exit
+
+interface Vlan6
+ standby version 2
+ standby 6 ip 172.20.7.3
+ standby 6 ipv6 2001:A:0:5::3
+ standby 6 preempt
+exit
+
+interface Vlan10
+ standby version 2
+ standby 10 ip 172.20.7.35
+ standby 10 ipv6 2001:A:0:6::3
+ standby 10 preempt
+exit
+
 interface Vlan20
- standby 20 ip 172.20.0.1
+ standby version 2
+ standby 20 ip 172.20.0.3
+ standby 20 ipv6 2001:A:0:0::3
  standby 20 preempt
 exit
+
 interface Vlan30
- standby 30 ip 172.20.1.1
+ standby version 2
+ standby 30 ip 172.20.1.3
+ standby 30 ipv6 2001:A:0:1::3
  standby 30 preempt
 exit
+
 interface Vlan40
- standby 40 ip 172.20.2.1
+ standby version 2
+ standby 40 ip 172.20.2.3
+ standby 40 ipv6 2001:A:0:2::3
  standby 40 preempt
 exit
+
 interface Vlan50
- standby 50 ip 172.20.4.1
+ standby version 2
+ standby 50 ip 172.20.4.3
+ standby 50 ipv6 2001:A:0:3::3
  standby 50 preempt
 exit
+
 interface Vlan60
- standby 60 ip 172.20.6.1
+ standby version 2
+ standby 60 ip 172.20.6.3
+ standby 60 ipv6 2001:A:0:4::3
  standby 60 preempt
 exit
+
 end
 write memory
