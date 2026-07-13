@@ -1,26 +1,31 @@
-#Parte 2
-Router:
-enable
-erase startup-config
-reload
+# Split - Configurações (RT1-St / SW1-St)
 
-Switch:  
-enable
-erase startup-config
-delete flash:vlan.dat
-reload
+## Parte 2 - Clear Configs and reload equipment
 
+### Router(RT1-St)
+enable
+erase startup-config (enter)
+reload (no save)
+
+### Switch(Sw1-St)  
+enable
+erase startup-config (enter)
+delete flash:vlan.dat (enter enter)
+reload (no save)
+
+- check SDM
 enable
 show sdm prefer
 
+- if necessary 
 configure terminal
 sdm prefer dual-ipv4-and-ipv6
 end
-reload
-(no se per
+reload (no save)
 
-#Parte 3
-Router e Switch:
+## Parte 3 -  Perform Equipment Initial Configuration
+
+### Router (RT1-St) e Switch (SW1-St)
 
 enable
 configure terminal
@@ -31,8 +36,10 @@ security passwords min-length 10
 service password-encryption
 enable secret classclass
 username cisco privilege 15 secret classclass
+
 crypto key generate rsa
 2048
+
 ip ssh version 2
 line console 0
  password classclass
@@ -43,11 +50,14 @@ line vty 0 15
  login local
  exec-timeout 0 30
 exit
+
 login block-for 300 attempts 3 within 120 
+
 banner motd #
 AVISO: Acesso restrito a pessoal autorizado.
 Todas as tentativas de acesso sao registadas e monitorizadas.
 #
+
 ip host RT1-Zg 172.20.7.97
 ip host RT1-Pl 10.0.0.2
 ip host RT1-St 10.0.0.6
@@ -57,12 +67,16 @@ ip host SW1-Zg 172.20.7.4
 ip host SW2-Zg 172.20.7.5
 ip host SW1-Pl 172.20.11.106
 ip host SW1-St 172.20.13.234
+
 end
 copy running-config startup-config
 
 
-#Parte 5
-Switch:
+## Parte 5 -  Configure VLANs, Trunks and Access Ports
+
+#### a. Criar Vlan
+###Switch(SW1-St)
+
 enable
 configure terminal
 vlan 5
@@ -87,6 +101,8 @@ vlan 99
  name BLACKHOLE
 exit
 
+#### b. Configurar trunks e portas de acesso
+-RT1-St
 interface FastEthernet0/1
  switchport mode trunk
  switchport trunk native vlan 7
@@ -94,12 +110,15 @@ interface FastEthernet0/1
  switchport nonegotiate
  no shutdown
 exit
+
+- PCD
 interface range FastEthernet0/2 - 15
  switchport mode access
  switchport access vlan 30
  switchport nonegotiate
 exit
 
+- Ap1-St
 interface range FastEthernet0/21 - 22
  switchport mode trunk
  switchport trunk native vlan 5
@@ -108,6 +127,7 @@ interface range FastEthernet0/21 - 22
  no shutdown
 exit
 
+- Portas não usadas - Vlan 99(blackhole) e shutdown
 interface range FastEthernet0/16 - 20
  switchport mode access
  switchport access vlan 99
@@ -122,9 +142,11 @@ interface range FastEthernet0/23 - 24
  shutdown
 exit
 
+- Gravar
 end
 copy running-config startup-config
 
+- Verificar
 show vlan brief
 show interfaces trunk
 show interfaces status
@@ -132,11 +154,200 @@ show interfaces status
 
 
 
-#Parte 6
-Router:
+# Parte 6 - Configure IPv4 and IPv6 on the Interfaces, Sub-Interfaces and SWIs
+
+### Router (RT1-St)
+
+enable
+configure terminal
+ipv6 unicast-routing
+
+interface GigabitEthernet0/1
+ description Link to SW1-St (LAN VLANs)
+ no ip address
+ no shutdown
+exit
+
+interface GigabitEthernet0/1.5
+ description APs (Split)
+ encapsulation dot1Q 5
+ ip address 172.20.13.225 255.255.255.248
+ ipv6 address 2001:C:0:6::1/64
+ ipv6 address FE80::1 link-local
+ ipv6 enable
+exit
+
+interface GigabitEthernet0/1.6
+ description Management (Split)
+ encapsulation dot1Q 6
+ ip address 172.20.13.233 255.255.255.248
+ ipv6 address 2001:C:0:7::1/64
+ ipv6 address FE80::1 link-local
+ ipv6 enable
+exit
+
+interface GigabitEthernet0/1.30
+ description Staff (Split)
+ encapsulation dot1Q 30
+ ip address 172.20.12.1 255.255.255.128
+ ipv6 address 2001:C::1/64
+ ipv6 address FE80::1 link-local
+ ipv6 enable
+exit
+
+interface GigabitEthernet0/1.50
+ description Wireless-St
+ encapsulation dot1Q 50
+ ip address 172.20.12.129 255.255.255.128
+ ipv6 address 2001:C:0:1::1/64
+ ipv6 address FE80::1 link-local
+ ipv6 enable
+exit
+
+interface GigabitEthernet0/1.60
+ description Guests-St
+ encapsulation dot1Q 60
+ ip address 172.20.13.193 255.255.255.224
+ ipv6 address 2001:C:0:5::1/64
+ ipv6 address FE80::1 link-local
+ ipv6 enable
+exit
+
+interface GigabitEthernet0/2
+ no ip address
+ no shutdown
+exit
+
+interface GigabitEthernet0/2.103
+ description Connection to RT1-Zg
+ encapsulation dot1Q 103
+ ip address 10.0.0.6 255.255.255.252
+ ipv6 address FE80::103ST link-local
+ ipv6 enable
+exit
+
+interface GigabitEthernet0/2.203
+ description Connection to RT1-Pl
+ encapsulation dot1Q 203
+ ip address 10.0.0.10 255.255.255.252
+ ipv6 address FE80::203ST link-local
+ ipv6 enable
+exit
+
+interface Loopback0
+ description Multimedia (LAN simulada)
+ ip address 172.20.13.1 255.255.255.192
+ ipv6 address 2001:C:0:2::1/64
+exit
+
+interface Loopback1
+ description Design (LAN simulada)
+ ip address 172.20.13.65 255.255.255.192
+ ipv6 address 2001:C:0:3::1/64
+exit
+
+interface Loopback2
+ description Communication (LAN simulada)
+ ip address 172.20.13.129 255.255.255.192
+ ipv6 address 2001:C:0:4::1/64
+exit
+
+end
+copy running-config startup-config
 
 
 
-#Parte 10
+#Parte 10 - Perform Security Configurations
 
-#Parte 11
+#### a. Verificar se as portas não usadas estão em shutdown na Parte 5
+
+show interfaces status | include disabled
+
+#### b. Port security nas portas de acesso Vlan 30 que é o que tem porta de acesso real
+
+- Vlan 30
+
+enable
+configure terminal
+interface range FastEthernet0/2 - 15
+ switchport port-security
+ switchport port-security maximum 5
+ switchport port-security violation shutdown
+ switchport port-security aging time 5
+ switchport port-security aging type inactivity
+exit
+
+#### c. DHCP Snooping
+
+ip dhcp snooping
+ip dhcp snooping vlan 30,50,60
+interface FastEthernet0/1
+ ip dhcp snooping trust
+exit
+interface range FastEthernet0/2 - 15
+ ip dhcp snooping limit rate 5
+exit
+interface range FastEthernet0/21 - 22
+ ip dhcp snooping limit rate 5
+exit
+
+#### d. Dynamic ARP Inspection (vlan 30)
+
+ip arp inspection vlan 30
+interface FastEthernet0/1
+ ip arp inspection trust
+exit
+interface range FastEthernet0/2 - 15
+ ip arp inspection limit rate 5
+exit
+
+#### e. PortFast
+interface range FastEthernet0/2 - 15
+spanning-tree portfast
+exit
+
+
+#### f.BPDU Guard
+
+interface range FastEthernet0/2 - 15
+ spanning-tree bpduguard enable
+exit
+
+- Gravar
+end
+copy running-config startup-config
+
+- Verificar
+show port-security interface FastEthernet0/2
+show ip dhcp snooping
+show ip arp inspection vlan 30
+show spanning-tree interface FastEthernet0/2 detail
+show spanning-tree summary
+
+
+#Parte 11 - Configure Static Routes 
+
+#### a.  Rotas entre localidades (RT1-St)
+
+enable
+configure terminal
+
+! IPv4 — para Zagreb (direta + backup via Pula)
+ip route 172.20.0.0 255.255.248.0 10.0.0.5
+ip route 172.20.0.0 255.255.248.0 10.0.0.9 200
+
+! IPv4 — para Pula (direta + backup via Zagreb)
+ip route 172.20.8.0 255.255.252.0 10.0.0.9
+ip route 172.20.8.0 255.255.252.0 10.0.0.5 200
+
+! IPv6 — para Zagreb e Pula (next-hop = vizinho, sufixo próprio do vizinho)
+ipv6 route 2001:A::/61 GigabitEthernet0/2.103 FE80::103ZG
+ipv6 route 2001:A::/61 GigabitEthernet0/2.203 FE80::203PL 200
+ipv6 route 2001:B::/61 GigabitEthernet0/2.203 FE80::203PL
+ipv6 route 2001:B::/61 GigabitEthernet0/2.103 FE80::103ZG 200
+
+- Guardar
+end
+copy running-config startup-config
+
+
