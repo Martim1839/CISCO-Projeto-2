@@ -1,1 +1,142 @@
+#Parte 2
+Router:
+enable
+erase startup-config
+reload
 
+Switch:  
+enable
+erase startup-config
+delete flash:vlan.dat
+reload
+
+enable
+show sdm prefer
+
+configure terminal
+sdm prefer dual-ipv4-and-ipv6
+end
+reload
+(no se per
+
+#Parte 3
+Router e Switch:
+
+enable
+configure terminal
+no ip domain-lookup
+hostname SW1-St
+ip domain-name isepacademy.ccna.itn.com
+security passwords min-length 10 
+service password-encryption
+enable secret classclass
+username cisco privilege 15 secret classclass
+crypto key generate rsa
+2048
+ip ssh version 2
+line console 0
+ password classclass
+ login
+exit
+line vty 0 15
+ transport input ssh
+ login local
+ exec-timeout 0 30
+exit
+login block-for 300 attempts 3 within 120 
+banner motd #
+AVISO: Acesso restrito a pessoal autorizado.
+Todas as tentativas de acesso sao registadas e monitorizadas.
+#
+ip host RT1-Zg 172.20.7.97
+ip host RT1-Pl 10.0.0.2
+ip host RT1-St 10.0.0.6
+ip host MLS1-Zg 172.20.7.98
+ip host MLS2-Zg 172.20.7.102
+ip host SW1-Zg 172.20.7.4
+ip host SW2-Zg 172.20.7.5
+ip host SW1-Pl 172.20.11.106
+ip host SW1-St 172.20.13.234
+end
+copy running-config startup-config
+
+
+#Parte 5
+Switch:
+enable
+configure terminal
+vlan 5
+ name APs
+vlan 6
+ name MANAGEMENT
+vlan 7
+ name NATIVE
+vlan 10
+ name SERVERS
+vlan 20
+ name ADMINISTRATION
+vlan 30
+ name STAFF
+vlan 40
+ name VOIP
+vlan 50
+ name WIRELESS
+vlan 60
+ name GUESTS
+vlan 99
+ name BLACKHOLE
+exit
+
+interface FastEthernet0/1
+ switchport mode trunk
+ switchport trunk native vlan 7
+ switchport trunk allowed vlan 5,6,30,50,60
+ switchport nonegotiate
+ no shutdown
+exit
+interface range FastEthernet0/2 - 15
+ switchport mode access
+ switchport access vlan 30
+ switchport nonegotiate
+exit
+
+interface range FastEthernet0/21 - 22
+ switchport mode trunk
+ switchport trunk native vlan 5
+ switchport trunk allowed vlan 5,50,60
+ switchport nonegotiate
+ no shutdown
+exit
+
+interface range FastEthernet0/16 - 20
+ switchport mode access
+ switchport access vlan 99
+ switchport nonegotiate
+ shutdown
+exit
+
+interface range FastEthernet0/23 - 24
+ switchport mode access
+ switchport access vlan 99
+ switchport nonegotiate
+ shutdown
+exit
+
+end
+copy running-config startup-config
+
+show vlan brief
+show interfaces trunk
+show interfaces status
+
+
+
+
+#Parte 6
+Router:
+
+
+
+#Parte 10
+
+#Parte 11
