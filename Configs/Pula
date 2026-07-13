@@ -211,7 +211,7 @@ interface Loopback0
  description Engineering (LAN simulada)
  ip address 172.20.8.1 255.255.255.0
  ipv6 address 2001:B::1/64
- ipv6 address FE80::L0 link-local
+ ipv6 address FE80::10 link-local
  no shutdown
 exit
 
@@ -219,7 +219,7 @@ interface Loopback1
  description Design (LAN simulada)
  ip address 172.20.11.65 255.255.255.224
  ipv6 address 2001:B:0:5::1/64
- ipv6 address FE80::L1 link-local
+ ipv6 address FE80::11 link-local
  no shutdown
 exit
 
@@ -227,7 +227,7 @@ interface Loopback2
  description Communication (LAN simulada)
  ip address 172.20.10.1 255.255.255.128
  ipv6 address 2001:B:0:2::1/64
- ipv6 address FE80::L2 link-local
+ ipv6 address FE80::12 link-local
  no shutdown
 exit
 
