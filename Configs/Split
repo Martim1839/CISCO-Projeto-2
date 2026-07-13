@@ -31,7 +31,7 @@ reload (no save)
 enable
 configure terminal
 no ip domain-lookup
-hostname SW1-St
+hostname SW1-St | RT1-St
 ip domain-name isepacademy.ccna.itn.com
 security passwords min-length 10 (no switch não dá)
 service password-encryption
