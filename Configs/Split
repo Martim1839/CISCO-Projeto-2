@@ -1,6 +1,6 @@
 # Split - Configurações (RT1-St / SW1-St)
 
-## Parte 2 - Clear Configs and reload equipment
+## Parte 2 - Clear Configs and reload equipment (Router e Switch)
 
 ### Router(RT1-St)
 enable
@@ -73,7 +73,7 @@ end
 copy running-config startup-config
 
 
-## Parte 5 -  Configure VLANs, Trunks and Access Ports
+## Parte 5 -  Configure VLANs, Trunks and Access Ports (Switch)
 
 ###Switch(SW1-St)
 
@@ -157,7 +157,7 @@ show interfaces status
 
 
 
-# Parte 6 - Configure IPv4 and IPv6 on the Interfaces, Sub-Interfaces and SWIs
+# Parte 6 - Configure IPv4 and IPv6 on the Interfaces, Sub-Interfaces and SWIs (Router e Switch)
 
 ### Router (RT1-St)
 
@@ -275,7 +275,7 @@ ipv6 route ::/0 Vlan6 FE80::1
 end
 copy running-config startup-config
 
-# Parte 7 - Adjust STP Default Configuration
+# Parte 7 - Adjust STP Default Configuration (Switch)
 ###Switch(SW1-St)
 
 enable
@@ -287,7 +287,7 @@ copy running-config startup-config
 -confirmar
 show spanning-tree summary
 
-#Parte 10 - Perform Security Configurations
+#Parte 10 - Perform Security Configurations (Switch)
 
 ###Switch(SW1-St)
 
@@ -359,7 +359,7 @@ show running-config interface FastEthernet0/2
 
 
 
-#Parte 11 - Configure Static Routes 
+#Parte 11 - Configure Static Routes (Router)
 
 #### a.  Rotas entre localidades (RT1-St)
 
