@@ -1,4 +1,4 @@
-# Split — Configurações (RT1-St / SW1-St)
+# Pula — Configurações (RT1-Pl / SW1-Pl)
 
 ## Part 3 — Initial Configuration
 
@@ -28,9 +28,9 @@ banner motd #
 AVISO: Acesso restrito a utilizadores autorizados. Todas as ligacoes sao monitorizadas e registadas. Qualquer tentativa de acesso nao autorizado sera reportada as autoridades competentes.
 #
 
-### ip host — RT1-St
-ip host RT1-Zg 10.0.0.5
-ip host RT1-Pl 10.0.0.9
+### ip host — RT1-Pl
+ip host RT1-Zg 10.0.0.1
+ip host RT1-St 10.0.0.10
 ip host MLS1-Zg 172.20.7.98
 ip host MLS2-Zg 172.20.7.102
 ip host SW1-Zg 172.20.7.4
@@ -38,18 +38,18 @@ ip host SW2-Zg 172.20.7.5
 ip host SW1-Pl 172.20.11.106
 ip host SW1-St 172.20.13.234
 
-### ip host — SW1-St
-ip host RT1-St 172.20.13.233
-ip host RT1-Zg 10.0.0.5
-ip host RT1-Pl 10.0.0.9
+### ip host — SW1-Pl
+ip host RT1-Pl 172.20.11.105
+ip host RT1-Zg 10.0.0.1
+ip host RT1-St 10.0.0.10
 ip host MLS1-Zg 172.20.7.98
 ip host MLS2-Zg 172.20.7.102
 ip host SW1-Zg 172.20.7.4
 ip host SW2-Zg 172.20.7.5
-ip host SW1-Pl 172.20.11.106
+ip host SW1-St 172.20.13.234
 
 
-## Part 5 — VLANs, Trunks e Access Ports (SW1-St)
+## Part 5 — VLANs, Trunks e Access Ports (SW1-Pl)
 
 ### 5a — Criar VLANs
 enable
@@ -123,7 +123,7 @@ exit
 
 ## Part 6 — IPv4/IPv6 nas Interfaces
 
-### RT1-St
+### RT1-Pl
 
 enable
 configure terminal
@@ -131,52 +131,52 @@ configure terminal
 ipv6 unicast-routing
 
 interface GigabitEthernet0/1
- description Trunk to SW1-St
+ description Trunk to SW1-Pl
  no ip address
  no shutdown
 exit
 
 interface GigabitEthernet0/1.5
- description APs (Split)
+ description APs (Pula)
  encapsulation dot1Q 5
- ip address 172.20.13.225 255.255.255.248
- ipv6 address 2001:C:0:6::1/64
+ ip address 172.20.11.97 255.255.255.248
+ ipv6 address 2001:B:0:6::1/64
  ipv6 address FE80::5 link-local
  no shutdown
 exit
 
 interface GigabitEthernet0/1.6
- description Management (Split)
+ description Management (Pula)
  encapsulation dot1Q 6
- ip address 172.20.13.233 255.255.255.248
- ipv6 address 2001:C:0:7::1/64
+ ip address 172.20.11.105 255.255.255.248
+ ipv6 address 2001:B:0:7::1/64
  ipv6 address FE80::6 link-local
  no shutdown
 exit
 
 interface GigabitEthernet0/1.30
- description Staff (Split)
+ description Staff (Pula)
  encapsulation dot1Q 30
- ip address 172.20.12.1 255.255.255.128
- ipv6 address 2001:C::1/64
+ ip address 172.20.10.129 255.255.255.128
+ ipv6 address 2001:B:0:3::1/64
  ipv6 address FE80::30 link-local
  no shutdown
 exit
 
 interface GigabitEthernet0/1.50
- description Wireless-St
+ description Wireless-Pl
  encapsulation dot1Q 50
- ip address 172.20.12.129 255.255.255.128
- ipv6 address 2001:C:0:1::1/64
+ ip address 172.20.9.1 255.255.255.0
+ ipv6 address 2001:B:0:1::1/64
  ipv6 address FE80::50 link-local
  no shutdown
 exit
 
 interface GigabitEthernet0/1.60
- description Guests-St
+ description Guests-Pl
  encapsulation dot1Q 60
- ip address 172.20.13.193 255.255.255.224
- ipv6 address 2001:C:0:5::1/64
+ ip address 172.20.11.1 255.255.255.192
+ ipv6 address 2001:B:0:4::1/64
  ipv6 address FE80::60 link-local
  no shutdown
 exit
@@ -187,116 +187,116 @@ interface GigabitEthernet0/2
  no shutdown
 exit
 
-interface GigabitEthernet0/2.103
+interface GigabitEthernet0/2.102
  description Connection to RT1-Zg
- encapsulation dot1Q 103
- ip address 10.0.0.6 255.255.255.252
- ipv6 address FE80::103:2 link-local
+ encapsulation dot1Q 102
+ ip address 10.0.0.2 255.255.255.252
+ ipv6 address FE80::102:2 link-local
  ipv6 enable
  no shutdown
 exit
 
 interface GigabitEthernet0/2.203
- description Connection to RT1-Pl
+ description Connection to RT1-St
  encapsulation dot1Q 203
- ip address 10.0.0.10 255.255.255.252
- ipv6 address FE80::203:2 link-local
+ ip address 10.0.0.9 255.255.255.252
+ ipv6 address FE80::203:1 link-local
  ipv6 enable
  no shutdown
 exit
 
 interface Loopback0
- description Multimedia (LAN simulada)
- ip address 172.20.13.1 255.255.255.192
- ipv6 address 2001:C:0:2::1/64
+ description Engineering (LAN simulada)
+ ip address 172.20.8.1 255.255.255.0
+ ipv6 address 2001:B::1/64
  ipv6 address FE80::L0 link-local
  no shutdown
 exit
 
 interface Loopback1
  description Design (LAN simulada)
- ip address 172.20.13.65 255.255.255.192
- ipv6 address 2001:C:0:3::1/64
+ ip address 172.20.11.65 255.255.255.224
+ ipv6 address 2001:B:0:5::1/64
  ipv6 address FE80::L1 link-local
  no shutdown
 exit
 
 interface Loopback2
  description Communication (LAN simulada)
- ip address 172.20.13.129 255.255.255.192
- ipv6 address 2001:C:0:4::1/64
+ ip address 172.20.10.1 255.255.255.128
+ ipv6 address 2001:B:0:2::1/64
  ipv6 address FE80::L2 link-local
  no shutdown
 exit
 
-### SW1-St
+### SW1-Pl
 
 enable
 configure terminal
 
 interface Vlan6
  description Management SVI
- ip address 172.20.13.234 255.255.255.248
- ipv6 address 2001:C:0:7::2/64
+ ip address 172.20.11.106 255.255.255.248
+ ipv6 address 2001:B:0:7::2/64
  ipv6 address FE80::1 link-local
  no shutdown
 exit
 
-ip default-gateway 172.20.13.233
+ip default-gateway 172.20.11.105
 ipv6 route ::/0 Vlan6 FE80::6
 
 end
 copy running-config startup-config
 
 
-## Part 8 — DHCPv4/DHCPv6 (RT1-St)
+## Part 8 — DHCPv4/DHCPv6 (RT1-Pl)
 
 enable
 configure terminal
 
 ! ===== DHCPv4 =====
 
-ip dhcp excluded-address 172.20.12.1
-ip dhcp excluded-address 172.20.12.129
-ip dhcp excluded-address 172.20.13.193
+ip dhcp excluded-address 172.20.10.129
+ip dhcp excluded-address 172.20.9.1
+ip dhcp excluded-address 172.20.11.1
 
-ip dhcp pool STAFF-ST
- network 172.20.12.0 255.255.255.128
- default-router 172.20.12.1
+ip dhcp pool STAFF-PL
+ network 172.20.10.128 255.255.255.128
+ default-router 172.20.10.129
  dns-server 172.20.7.36
  domain-name isepacademy.ccna.itn.com
 exit
 
-ip dhcp pool WIRELESS-ST
- network 172.20.12.128 255.255.255.128
- default-router 172.20.12.129
+ip dhcp pool WIRELESS-PL
+ network 172.20.9.0 255.255.255.0
+ default-router 172.20.9.1
  dns-server 172.20.7.36
  domain-name isepacademy.ccna.itn.com
 exit
 
-ip dhcp pool GUESTS-ST
- network 172.20.13.192 255.255.255.224
- default-router 172.20.13.193
+ip dhcp pool GUESTS-PL
+ network 172.20.11.0 255.255.255.192
+ default-router 172.20.11.1
  dns-server 172.20.7.36
  domain-name isepacademy.ccna.itn.com
 exit
 
 ! ===== DHCPv6 =====
 
-ipv6 dhcp pool STAFF-ST-V6
- address prefix 2001:C::/64
+ipv6 dhcp pool STAFF-PL-V6
+ address prefix 2001:B:0:3::/64
  dns-server 2001:4860:4860::8888
  domain-name isepacademy.ccna.itn.com
 exit
 
-ipv6 dhcp pool WIRELESS-ST-V6
- address prefix 2001:C:0:1::/64
+ipv6 dhcp pool WIRELESS-PL-V6
+ address prefix 2001:B:0:1::/64
  dns-server 2001:4860:4860::8888
  domain-name isepacademy.ccna.itn.com
 exit
 
-ipv6 dhcp pool GUESTS-ST-V6
- address prefix 2001:C:0:5::/64
+ipv6 dhcp pool GUESTS-PL-V6
+ address prefix 2001:B:0:4::/64
  dns-server 2001:4860:4860::8888
  domain-name isepacademy.ccna.itn.com
 exit
@@ -319,7 +319,7 @@ interface GigabitEthernet0/1.60
 exit
 
 
-## Part 10 — Segurança (SW1-St)
+## Part 10 — Segurança (SW1-Pl)
 
 a. Verificar portas desligadas:
 show interfaces status | include disabled
@@ -370,26 +370,26 @@ end
 write memory
 
 
-## Part 11a — Rotas Estáticas (RT1-St)
+## Part 11a — Rotas Estáticas (RT1-Pl)
 
 enable
 configure terminal
 
 ! ---- IPv4 ----
 ! Para Zagreb: direto (primário) via RT1-Zg
-ip route 172.20.0.0 255.255.248.0 10.0.0.5
-! Para Zagreb: backup via RT1-Pl (AD 200, flutuante)
-ip route 172.20.0.0 255.255.248.0 10.0.0.9 200
-! Para Pula: direto (primário) via RT1-Pl
-ip route 172.20.8.0 255.255.252.0 10.0.0.9
-! Para Pula: backup via RT1-Zg (AD 200, flutuante)
-ip route 172.20.8.0 255.255.252.0 10.0.0.5 200
+ip route 172.20.0.0 255.255.248.0 10.0.0.1
+! Para Zagreb: backup via RT1-St (AD 200, flutuante)
+ip route 172.20.0.0 255.255.248.0 10.0.0.10 200
+! Para Split: direto (primário) via RT1-St
+ip route 172.20.12.0 255.255.254.0 10.0.0.10
+! Para Split: backup via RT1-Zg (AD 200, flutuante)
+ip route 172.20.12.0 255.255.254.0 10.0.0.1 200
 
 ! ---- IPv6 ----
-ipv6 route 2001:A::/61 GigabitEthernet0/2.103 FE80::103
-ipv6 route 2001:A::/61 GigabitEthernet0/2.203 FE80::203:1 200
-ipv6 route 2001:B::/61 GigabitEthernet0/2.203 FE80::203:1
-ipv6 route 2001:B::/61 GigabitEthernet0/2.103 FE80::103 200
+ipv6 route 2001:A::/61 GigabitEthernet0/2.102 FE80::102
+ipv6 route 2001:A::/61 GigabitEthernet0/2.203 FE80::203:2 200
+ipv6 route 2001:C::/61 GigabitEthernet0/2.203 FE80::203:2
+ipv6 route 2001:C::/61 GigabitEthernet0/2.102 FE80::102 200
 
 end
 write memory
