@@ -355,6 +355,8 @@ show ip dhcp snooping
 show ip arp inspection vlan 30
 show spanning-tree interface FastEthernet0/2 detail
 show spanning-tree summary
+show running-config interface FastEthernet0/2
+
 
 
 #Parte 11 - Configure Static Routes 
