@@ -1,1 +1,395 @@
+# Split — Configurações (RT1-St / SW1-St)
 
+## Part 3 — Initial Configuration
+
+enable
+configure terminal
+no ip domain-lookup
+hostname <nome>
+ip domain-name isepacademy.ccna.itn.com
+security passwords min-length 10
+service password-encryption
+enable secret classclass
+username cisco secret classclass
+crypto key generate rsa
+2048
+ip ssh version 2
+line console 0
+ password classclass
+ login
+exit
+line vty 0 15
+ transport input ssh
+ login local
+ exec-timeout 0 30
+exit
+login block-for 300 attempts 3 within 120
+banner motd #
+AVISO: Acesso restrito a utilizadores autorizados. Todas as ligacoes sao monitorizadas e registadas. Qualquer tentativa de acesso nao autorizado sera reportada as autoridades competentes.
+#
+
+### ip host — RT1-St
+ip host RT1-Zg 10.0.0.5
+ip host RT1-Pl 10.0.0.9
+ip host MLS1-Zg 172.20.7.98
+ip host MLS2-Zg 172.20.7.102
+ip host SW1-Zg 172.20.7.4
+ip host SW2-Zg 172.20.7.5
+ip host SW1-Pl 172.20.11.106
+ip host SW1-St 172.20.13.234
+
+### ip host — SW1-St
+ip host RT1-St 172.20.13.233
+ip host RT1-Zg 10.0.0.5
+ip host RT1-Pl 10.0.0.9
+ip host MLS1-Zg 172.20.7.98
+ip host MLS2-Zg 172.20.7.102
+ip host SW1-Zg 172.20.7.4
+ip host SW2-Zg 172.20.7.5
+ip host SW1-Pl 172.20.11.106
+
+
+## Part 5 — VLANs, Trunks e Access Ports (SW1-St)
+
+### 5a — Criar VLANs
+enable
+configure terminal
+vlan 5
+ name APs
+vlan 6
+ name MANAGEMENT
+vlan 7
+ name NATIVE
+vlan 10
+ name SERVERS
+vlan 20
+ name ADMINISTRATION
+vlan 30
+ name STAFF
+vlan 40
+ name VOIP
+vlan 50
+ name WIRELESS
+vlan 60
+ name GUESTS
+vlan 99
+ name BLACKHOLE
+exit
+
+### 5b — Trunks e Access Ports
+enable
+configure terminal
+interface FastEthernet0/1
+ switchport mode trunk
+ switchport trunk native vlan 7
+ switchport trunk allowed vlan 5,6,30,50,60
+ switchport nonegotiate
+exit
+
+interface range FastEthernet0/2-15
+ switchport mode access
+ switchport access vlan 30
+ switchport nonegotiate
+exit
+
+interface range FastEthernet0/21-22
+ switchport mode trunk
+ switchport trunk native vlan 5
+ switchport trunk allowed vlan 5,50,60
+ switchport nonegotiate
+exit
+
+! Portas não usadas
+interface range FastEthernet0/16-20
+ switchport mode access
+ switchport access vlan 99
+ switchport nonegotiate
+ shutdown
+exit
+
+interface range FastEthernet0/23-24
+ switchport mode access
+ switchport access vlan 99
+ switchport nonegotiate
+ shutdown
+exit
+
+interface range GigabitEthernet0/1-2
+ switchport mode access
+ switchport access vlan 99
+ shutdown
+exit
+
+
+## Part 6 — IPv4/IPv6 nas Interfaces
+
+### RT1-St
+
+enable
+configure terminal
+
+ipv6 unicast-routing
+
+interface GigabitEthernet0/1
+ description Trunk to SW1-St
+ no ip address
+ no shutdown
+exit
+
+interface GigabitEthernet0/1.5
+ description APs (Split)
+ encapsulation dot1Q 5
+ ip address 172.20.13.225 255.255.255.248
+ ipv6 address 2001:C:0:6::1/64
+ ipv6 address FE80::5 link-local
+ no shutdown
+exit
+
+interface GigabitEthernet0/1.6
+ description Management (Split)
+ encapsulation dot1Q 6
+ ip address 172.20.13.233 255.255.255.248
+ ipv6 address 2001:C:0:7::1/64
+ ipv6 address FE80::6 link-local
+ no shutdown
+exit
+
+interface GigabitEthernet0/1.30
+ description Staff (Split)
+ encapsulation dot1Q 30
+ ip address 172.20.12.1 255.255.255.128
+ ipv6 address 2001:C::1/64
+ ipv6 address FE80::30 link-local
+ no shutdown
+exit
+
+interface GigabitEthernet0/1.50
+ description Wireless-St
+ encapsulation dot1Q 50
+ ip address 172.20.12.129 255.255.255.128
+ ipv6 address 2001:C:0:1::1/64
+ ipv6 address FE80::50 link-local
+ no shutdown
+exit
+
+interface GigabitEthernet0/1.60
+ description Guests-St
+ encapsulation dot1Q 60
+ ip address 172.20.13.193 255.255.255.224
+ ipv6 address 2001:C:0:5::1/64
+ ipv6 address FE80::60 link-local
+ no shutdown
+exit
+
+interface GigabitEthernet0/2
+ description Trunk to SW0 (Inter-router WAN)
+ no ip address
+ no shutdown
+exit
+
+interface GigabitEthernet0/2.103
+ description Connection to RT1-Zg
+ encapsulation dot1Q 103
+ ip address 10.0.0.6 255.255.255.252
+ ipv6 address FE80::103:2 link-local
+ ipv6 enable
+ no shutdown
+exit
+
+interface GigabitEthernet0/2.203
+ description Connection to RT1-Pl
+ encapsulation dot1Q 203
+ ip address 10.0.0.10 255.255.255.252
+ ipv6 address FE80::203:2 link-local
+ ipv6 enable
+ no shutdown
+exit
+
+interface Loopback0
+ description Multimedia (LAN simulada)
+ ip address 172.20.13.1 255.255.255.192
+ ipv6 address 2001:C:0:2::1/64
+ ipv6 address FE80::L0 link-local
+ no shutdown
+exit
+
+interface Loopback1
+ description Design (LAN simulada)
+ ip address 172.20.13.65 255.255.255.192
+ ipv6 address 2001:C:0:3::1/64
+ ipv6 address FE80::L1 link-local
+ no shutdown
+exit
+
+interface Loopback2
+ description Communication (LAN simulada)
+ ip address 172.20.13.129 255.255.255.192
+ ipv6 address 2001:C:0:4::1/64
+ ipv6 address FE80::L2 link-local
+ no shutdown
+exit
+
+### SW1-St
+
+enable
+configure terminal
+
+interface Vlan6
+ description Management SVI
+ ip address 172.20.13.234 255.255.255.248
+ ipv6 address 2001:C:0:7::2/64
+ ipv6 address FE80::1 link-local
+ no shutdown
+exit
+
+ip default-gateway 172.20.13.233
+ipv6 route ::/0 Vlan6 FE80::6
+
+end
+copy running-config startup-config
+
+
+## Part 8 — DHCPv4/DHCPv6 (RT1-St)
+
+enable
+configure terminal
+
+! ===== DHCPv4 =====
+
+ip dhcp excluded-address 172.20.12.1
+ip dhcp excluded-address 172.20.12.129
+ip dhcp excluded-address 172.20.13.193
+
+ip dhcp pool STAFF-ST
+ network 172.20.12.0 255.255.255.128
+ default-router 172.20.12.1
+ dns-server 172.20.7.36
+ domain-name isepacademy.ccna.itn.com
+exit
+
+ip dhcp pool WIRELESS-ST
+ network 172.20.12.128 255.255.255.128
+ default-router 172.20.12.129
+ dns-server 172.20.7.36
+ domain-name isepacademy.ccna.itn.com
+exit
+
+ip dhcp pool GUESTS-ST
+ network 172.20.13.192 255.255.255.224
+ default-router 172.20.13.193
+ dns-server 172.20.7.36
+ domain-name isepacademy.ccna.itn.com
+exit
+
+! ===== DHCPv6 =====
+
+ipv6 dhcp pool STAFF-ST-V6
+ address prefix 2001:C::/64
+ dns-server 2001:4860:4860::8888
+ domain-name isepacademy.ccna.itn.com
+exit
+
+ipv6 dhcp pool WIRELESS-ST-V6
+ address prefix 2001:C:0:1::/64
+ dns-server 2001:4860:4860::8888
+ domain-name isepacademy.ccna.itn.com
+exit
+
+ipv6 dhcp pool GUESTS-ST-V6
+ address prefix 2001:C:0:5::/64
+ dns-server 2001:4860:4860::8888
+ domain-name isepacademy.ccna.itn.com
+exit
+
+! ===== Ativar nas sub-interfaces =====
+
+interface GigabitEthernet0/1.30
+ ipv6 nd managed-config-flag
+ ipv6 nd other-config-flag
+exit
+
+interface GigabitEthernet0/1.50
+ ipv6 nd managed-config-flag
+ ipv6 nd other-config-flag
+exit
+
+interface GigabitEthernet0/1.60
+ ipv6 nd managed-config-flag
+ ipv6 nd other-config-flag
+exit
+
+
+## Part 10 — Segurança (SW1-St)
+
+a. Verificar portas desligadas:
+show interfaces status | include disabled
+
+enable
+configure terminal
+
+! ---- b. Port-security (VLAN 30) ----
+interface range FastEthernet0/2-15
+ switchport port-security
+ switchport port-security maximum 5
+ switchport port-security violation shutdown
+ switchport port-security aging time 5
+ switchport port-security aging type inactivity
+exit
+
+! ---- c. DHCP Snooping ----
+ip dhcp snooping
+ip dhcp snooping vlan 30,50,60
+interface FastEthernet0/1
+ ip dhcp snooping trust
+exit
+interface range FastEthernet0/2-15
+ ip dhcp snooping limit rate 5
+exit
+interface range FastEthernet0/21-22
+ ip dhcp snooping limit rate 5
+exit
+
+! ---- d. Dynamic ARP Inspection (VLAN 30) ----
+ip arp inspection vlan 30
+interface FastEthernet0/1
+ ip arp inspection trust
+exit
+interface range FastEthernet0/2-15
+ ip arp inspection limit rate 5
+exit
+
+! ---- e. Portfast (global) ----
+spanning-tree portfast default
+
+! ---- f. BPDU Guard ----
+interface range FastEthernet0/2-15
+ spanning-tree bpduguard enable
+exit
+
+end
+write memory
+
+
+## Part 11a — Rotas Estáticas (RT1-St)
+
+enable
+configure terminal
+
+! ---- IPv4 ----
+! Para Zagreb: direto (primário) via RT1-Zg
+ip route 172.20.0.0 255.255.248.0 10.0.0.5
+! Para Zagreb: backup via RT1-Pl (AD 200, flutuante)
+ip route 172.20.0.0 255.255.248.0 10.0.0.9 200
+! Para Pula: direto (primário) via RT1-Pl
+ip route 172.20.8.0 255.255.252.0 10.0.0.9
+! Para Pula: backup via RT1-Zg (AD 200, flutuante)
+ip route 172.20.8.0 255.255.252.0 10.0.0.5 200
+
+! ---- IPv6 ----
+ipv6 route 2001:A::/61 GigabitEthernet0/2.103 FE80::103
+ipv6 route 2001:A::/61 GigabitEthernet0/2.203 FE80::203:1 200
+ipv6 route 2001:B::/61 GigabitEthernet0/2.203 FE80::203:1
+ipv6 route 2001:B::/61 GigabitEthernet0/2.103 FE80::103 200
+
+end
+write memory
