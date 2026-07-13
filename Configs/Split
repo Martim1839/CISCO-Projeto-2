@@ -275,6 +275,18 @@ ipv6 route ::/0 Vlan6 FE80::1
 end
 copy running-config startup-config
 
+# Parte 7 - Adjust STP Default Configuration
+###Switch(SW1-St)
+
+enable
+configure terminal
+spanning-tree mode rapid-pvst
+end
+copy running-config startup-config
+
+-confirmar
+show spanning-tree summary
+
 #Parte 10 - Perform Security Configurations
 
 ###Switch(SW1-St)
