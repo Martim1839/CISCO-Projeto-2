@@ -75,8 +75,10 @@ copy running-config startup-config
 
 ## Parte 5 -  Configure VLANs, Trunks and Access Ports
 
-#### a. Criar Vlan
 ###Switch(SW1-St)
+
+#### a. Criar Vlan
+
 
 enable
 configure terminal
