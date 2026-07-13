@@ -225,7 +225,7 @@ interface GigabitEthernet0/2.103
  description Connection to RT1-Zg
  encapsulation dot1Q 103
  ip address 10.0.0.6 255.255.255.252
- ipv6 address FE80::103ST link-local
+ ipv6 address FE80::103:3 link-local
  ipv6 enable
 exit
 
@@ -233,7 +233,7 @@ interface GigabitEthernet0/2.203
  description Connection to RT1-Pl
  encapsulation dot1Q 203
  ip address 10.0.0.10 255.255.255.252
- ipv6 address FE80::203ST link-local
+ ipv6 address FE80::203:3 link-local
  ipv6 enable
 exit
 
@@ -375,10 +375,10 @@ ip route 172.20.8.0 255.255.252.0 10.0.0.9
 ip route 172.20.8.0 255.255.252.0 10.0.0.5 200
 
 ! IPv6 — para Zagreb e Pula (next-hop = vizinho, sufixo próprio do vizinho)
-ipv6 route 2001:A::/61 GigabitEthernet0/2.103 FE80::103ZG
-ipv6 route 2001:A::/61 GigabitEthernet0/2.203 FE80::203PL 200
-ipv6 route 2001:B::/61 GigabitEthernet0/2.203 FE80::203PL
-ipv6 route 2001:B::/61 GigabitEthernet0/2.103 FE80::103ZG 200
+ipv6 route 2001:A::/61 GigabitEthernet0/2.103 FE80::103:1
+ipv6 route 2001:A::/61 GigabitEthernet0/2.203 FE80::203:2 200
+ipv6 route 2001:B::/61 GigabitEthernet0/2.203 FE80::203:2
+ipv6 route 2001:B::/61 GigabitEthernet0/2.103 FE80::103:1 200
 
 - Guardar
 end
