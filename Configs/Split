@@ -33,7 +33,7 @@ configure terminal
 no ip domain-lookup
 hostname SW1-St
 ip domain-name isepacademy.ccna.itn.com
-security passwords min-length 10 
+security passwords min-length 10 (no switch não dá)
 service password-encryption
 enable secret classclass
 username cisco privilege 15 secret classclass
@@ -52,7 +52,7 @@ line vty 0 15
  exec-timeout 0 30
 exit
 
-login block-for 300 attempts 3 within 120 
+login block-for 300 attempts 3 within 120  (no switch não dá)
 
 banner motd #
 AVISO: Acesso restrito a pessoal autorizado.
