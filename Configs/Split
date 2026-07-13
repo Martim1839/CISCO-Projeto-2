@@ -271,7 +271,7 @@ interface Vlan6
  no shutdown
 exit
 ip default-gateway 172.20.13.233
-ipv6 route ::/0 FE80::1 Vlan6
+ipv6 route ::/0 Vlan6 FE80::1 
 end
 copy running-config startup-config
 
