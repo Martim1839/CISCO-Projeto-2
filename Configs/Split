@@ -277,6 +277,8 @@ copy running-config startup-config
 
 #Parte 10 - Perform Security Configurations
 
+###Switch(SW1-St)
+
 #### a. Verificar se as portas não usadas estão em shutdown na Parte 5
 
 show interfaces status | include disabled
