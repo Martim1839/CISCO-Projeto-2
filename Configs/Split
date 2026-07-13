@@ -287,6 +287,83 @@ copy running-config startup-config
 -confirmar
 show spanning-tree summary
 
+# Parte 8 - Implement DHCPv4 and DHCPv6 (Router)
+
+### Router (RT1-St)
+
+enable
+configure terminal
+
+! ===== DHCPv4 =====
+
+ip dhcp excluded-address 172.20.12.1
+ip dhcp excluded-address 172.20.12.129
+ip dhcp excluded-address 172.20.13.193
+
+ip dhcp pool STAFF-ST
+ network 172.20.12.0 255.255.255.128
+ default-router 172.20.12.1
+ dns-server 172.20.7.36
+ domain-name isepacademy.ccna.itn.com
+exit
+
+ip dhcp pool WIRELESS-ST
+ network 172.20.12.128 255.255.255.128
+ default-router 172.20.12.129
+ dns-server 172.20.7.36
+ domain-name isepacademy.ccna.itn.com
+exit
+
+ip dhcp pool GUESTS-ST
+ network 172.20.13.192 255.255.255.224
+ default-router 172.20.13.193
+ dns-server 172.20.7.36
+ domain-name isepacademy.ccna.itn.com
+exit
+
+! ===== DHCPv6 =====
+
+ipv6 dhcp pool STAFF-ST-V6
+ address prefix 2001:C::/64
+ dns-server 2001:4860:4860::8888
+ domain-name isepacademy.ccna.itn.com
+exit
+
+ipv6 dhcp pool WIRELESS-ST-V6
+ address prefix 2001:C:0:1::/64
+ dns-server 2001:4860:4860::8888
+ domain-name isepacademy.ccna.itn.com
+exit
+
+ipv6 dhcp pool GUESTS-ST-V6
+ address prefix 2001:C:0:5::/64
+ dns-server 2001:4860:4860::8888
+ domain-name isepacademy.ccna.itn.com
+exit
+
+! ===== Ativar DHCPv6 nas sub-interfaces =====
+
+interface GigabitEthernet0/1.30
+ ipv6 dhcp server STAFF-ST-V6
+ ipv6 nd managed-config-flag
+ ipv6 nd other-config-flag
+exit
+
+interface GigabitEthernet0/1.50
+ ipv6 dhcp server WIRELESS-ST-V6
+ ipv6 nd managed-config-flag
+ ipv6 nd other-config-flag
+exit
+
+interface GigabitEthernet0/1.60
+ ipv6 dhcp server GUESTS-ST-V6
+ ipv6 nd managed-config-flag
+ ipv6 nd other-config-flag
+exit
+
+end
+copy running-config startup-config
+
 #Parte 10 - Perform Security Configurations (Switch)
 
 ###Switch(SW1-St)
