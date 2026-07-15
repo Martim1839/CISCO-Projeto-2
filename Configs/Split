@@ -345,19 +345,19 @@ exit
 
 ! ===== Ativar DHCPv6 nas sub-interfaces =====
 
-interface GigabitEthernet0/1.30
+interface GigabitEthernet0/0.30
  ipv6 dhcp server STAFF-ST-V6
  ipv6 nd managed-config-flag
  ipv6 nd other-config-flag
 exit
 
-interface GigabitEthernet0/1.50
+interface GigabitEthernet0/0.50
  ipv6 dhcp server WIRELESS-ST-V6
  ipv6 nd managed-config-flag
  ipv6 nd other-config-flag
 exit
 
-interface GigabitEthernet0/1.60
+interface GigabitEthernet0/0.60
  ipv6 dhcp server GUESTS-ST-V6
  ipv6 nd managed-config-flag
  ipv6 nd other-config-flag
