@@ -462,3 +462,32 @@ end
 copy running-config startup-config
 
 
+
+Confirmar Router-St:
+
+Parte 3 :
+show running-config | include hostname
+show running-config | include domain-name
+show ip ssh
+
+Parte 6:
+show ip interface brief
+
+show ipv6 interface brief
+
+Parte 8:
+show ip dhcp pool
+
+show ipv6 dhcp pool
+
+show ipv6 dhcp interface
+
+Parte 11:
+show ip route static
+
+show ipv6 route static
+
+Teste de conectividade:
+ping 172.20.13.234
+ping 10.0.0.5
+ping 10.0.0.9
