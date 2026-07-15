@@ -24,7 +24,7 @@ end
 copy running-config startup-config (ou simplesmente yes no reload)
 reload (no save)
 
-## Parte 3 -  Perform Equipment Initial Configuration
+## Parte 3 -  Perform Equipment Initial Configuration (Router e Switch)
 
 ### Router (RT1-St) e Switch (SW1-St)
 
@@ -158,8 +158,6 @@ show interfaces status
 
 
 # Parte 6 - Configure IPv4 and IPv6 on the Interfaces, Sub-Interfaces and SWIs (Router e Switch) - depende das portas físicas
-
-### Router (RT1-St)
 
 ### Router (RT1-St)
 
