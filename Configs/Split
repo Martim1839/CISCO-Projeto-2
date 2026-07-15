@@ -161,17 +161,19 @@ show interfaces status
 
 ### Router (RT1-St)
 
+### Router (RT1-St)
+
 enable
 configure terminal
 ipv6 unicast-routing
 
-interface GigabitEthernet0/1
+interface GigabitEthernet0/0
  description Link to SW1-St (LAN VLANs)
  no ip address
  no shutdown
 exit
 
-interface GigabitEthernet0/1.5
+interface GigabitEthernet0/0.5
  description APs (Split)
  encapsulation dot1Q 5
  ip address 172.20.13.225 255.255.255.248
@@ -180,7 +182,7 @@ interface GigabitEthernet0/1.5
  ipv6 enable
 exit
 
-interface GigabitEthernet0/1.6
+interface GigabitEthernet0/0.6
  description Management (Split)
  encapsulation dot1Q 6
  ip address 172.20.13.233 255.255.255.248
@@ -189,7 +191,7 @@ interface GigabitEthernet0/1.6
  ipv6 enable
 exit
 
-interface GigabitEthernet0/1.30
+interface GigabitEthernet0/0.30
  description Staff (Split)
  encapsulation dot1Q 30
  ip address 172.20.12.1 255.255.255.128
@@ -198,7 +200,7 @@ interface GigabitEthernet0/1.30
  ipv6 enable
 exit
 
-interface GigabitEthernet0/1.50
+interface GigabitEthernet0/0.50
  description Wireless-St
  encapsulation dot1Q 50
  ip address 172.20.12.129 255.255.255.128
@@ -207,7 +209,7 @@ interface GigabitEthernet0/1.50
  ipv6 enable
 exit
 
-interface GigabitEthernet0/1.60
+interface GigabitEthernet0/0.60
  description Guests-St
  encapsulation dot1Q 60
  ip address 172.20.13.193 255.255.255.224
@@ -216,12 +218,12 @@ interface GigabitEthernet0/1.60
  ipv6 enable
 exit
 
-interface GigabitEthernet0/2
+interface GigabitEthernet0/1
  no ip address
  no shutdown
 exit
 
-interface GigabitEthernet0/2.103
+interface GigabitEthernet0/1.103
  description Connection to RT1-Zg
  encapsulation dot1Q 103
  ip address 10.0.0.6 255.255.255.252
@@ -229,7 +231,7 @@ interface GigabitEthernet0/2.103
  ipv6 enable
 exit
 
-interface GigabitEthernet0/2.203
+interface GigabitEthernet0/1.203
  description Connection to RT1-Pl
  encapsulation dot1Q 203
  ip address 10.0.0.10 255.255.255.252
@@ -452,10 +454,10 @@ ip route 172.20.8.0 255.255.252.0 10.0.0.9
 ip route 172.20.8.0 255.255.252.0 10.0.0.5 200
 
 ! IPv6 — para Zagreb e Pula (next-hop = vizinho, sufixo próprio do vizinho)
-ipv6 route 2001:A::/61 GigabitEthernet0/2.103 FE80::103:1
-ipv6 route 2001:A::/61 GigabitEthernet0/2.203 FE80::203:2 200
-ipv6 route 2001:B::/61 GigabitEthernet0/2.203 FE80::203:2
-ipv6 route 2001:B::/61 GigabitEthernet0/2.103 FE80::103:1 200
+ipv6 route 2001:A::/61 GigabitEthernet0/1.103 FE80::103:1
+ipv6 route 2001:A::/61 GigabitEthernet0/1.203 FE80::203:2 200
+ipv6 route 2001:B::/61 GigabitEthernet0/1.203 FE80::203:2
+ipv6 route 2001:B::/61 GigabitEthernet0/1.103 FE80::103:1 200
 
 - Guardar
 end
