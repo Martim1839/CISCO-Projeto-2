@@ -73,7 +73,7 @@ end
 copy running-config startup-config
 
 
-## Parte 5 -  Configure VLANs, Trunks and Access Ports (Switch)
+## Parte 5 -  Configure VLANs, Trunks and Access Ports (Switch) - depende das portas físicas
 
 ###Switch(SW1-St)
 
@@ -157,7 +157,7 @@ show interfaces status
 
 
 
-# Parte 6 - Configure IPv4 and IPv6 on the Interfaces, Sub-Interfaces and SWIs (Router e Switch)
+# Parte 6 - Configure IPv4 and IPv6 on the Interfaces, Sub-Interfaces and SWIs (Router e Switch) - depende das portas físicas
 
 ### Router (RT1-St)
 
@@ -436,7 +436,7 @@ show running-config interface FastEthernet0/2
 
 
 
-#Parte 11 - Configure Static Routes (Router)
+#Parte 11 - Configure Static Routes (Router) - depende das portas físicas
 
 #### a.  Rotas entre localidades (RT1-St)
 
