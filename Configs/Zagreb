@@ -171,6 +171,139 @@ ipv6 route 2001:A:0:4::/64 FE80::11 200
 end
 copy running-config startup-config
 
+enable
+configure terminal
+no ip domain-lookup
+hostname DHCP-SRV
+ip domain-name isepacademy.ccna.itn.com
+security passwords min-length 10
+service password-encryption
+enable secret classclass
+username cisco secret classclass
+crypto key generate rsa modulus 2048
+ip ssh version 2
+line console 0
+ password classclass
+ login
+exit
+line vty 0 15
+ transport input ssh
+ login local
+ exec-timeout 0 30
+exit
+login block-for 300 attempts 3 within 120
+banner motd #
+AVISO: Acesso restrito a utilizadores autorizados. Todas as ligacoes sao monitorizadas e registadas. Qualquer tentativa de acesso nao autorizado sera reportada as autoridades competentes.
+#
+
+ip host RT1-Zg 172.20.7.97
+ip host MLS1-Zg 172.20.7.98
+ip host MLS2-Zg 172.20.7.102
+ip host SW1-Zg 172.20.7.4
+
+
+! =========================================================
+! Interface de ligação ao SW1-Zg (VLAN Servers)
+! =========================================================
+ipv6 unicast-routing
+
+interface GigabitEthernet0/0
+ description Connection to SW1-Zg (Servers VLAN)
+ ip address 172.20.7.36 255.255.255.224
+ ipv6 address 2001:A:0:6::5/64
+ ipv6 address FE80::36 link-local
+ no shutdown
+exit
+
+! Rota default para sair da própria VLAN (via vIP HSRP da VLAN 10)
+ip route 0.0.0.0 0.0.0.0 172.20.7.35
+ipv6 route ::/0 2001:A:0:6::3
+
+
+! =========================================================
+! Part 8a — DHCPv4 (Administration, Staff, VoIP, Wireless-Zg, Guests-Zg)
+! =========================================================
+
+! Excluir os gateways/vIPs reais de cada rede
+ip dhcp excluded-address 172.20.4.1 172.20.4.3
+ip dhcp excluded-address 172.20.5.1 172.20.5.3
+ip dhcp excluded-address 172.20.0.1 172.20.0.3
+ip dhcp excluded-address 172.20.2.1 172.20.2.3
+ip dhcp excluded-address 172.20.6.1 172.20.6.3
+
+ip dhcp pool ADMINISTRATION-ZG
+ network 172.20.4.0 255.255.255.0
+ default-router 172.20.4.3
+ dns-server 172.20.7.36
+ domain-name isepacademy.ccna.itn.com
+exit
+
+ip dhcp pool STAFF-ZG
+ network 172.20.5.0 255.255.255.0
+ default-router 172.20.5.3
+ dns-server 172.20.7.36
+ domain-name isepacademy.ccna.itn.com
+exit
+
+ip dhcp pool VOIP-ZG
+ network 172.20.0.0 255.255.254.0
+ default-router 172.20.0.3
+ dns-server 172.20.7.36
+ domain-name isepacademy.ccna.itn.com
+exit
+
+ip dhcp pool WIRELESS-ZG
+ network 172.20.2.0 255.255.254.0
+ default-router 172.20.2.3
+ dns-server 172.20.7.36
+ domain-name isepacademy.ccna.itn.com
+exit
+
+ip dhcp pool GUESTS-ZG
+ network 172.20.6.0 255.255.255.0
+ default-router 172.20.6.3
+ dns-server 172.20.7.36
+ domain-name isepacademy.ccna.itn.com
+exit
+
+
+! =========================================================
+! Part 8a — DHCPv6 (stateful)
+! =========================================================
+
+ipv6 dhcp pool ADMINISTRATION-ZG-V6
+ address prefix 2001:A:0:2::/64
+ dns-server 2001:4860:4860::8888
+ domain-name isepacademy.ccna.itn.com
+exit
+
+ipv6 dhcp pool STAFF-ZG-V6
+ address prefix 2001:A:0:3::/64
+ dns-server 2001:4860:4860::8888
+ domain-name isepacademy.ccna.itn.com
+exit
+
+ipv6 dhcp pool VOIP-ZG-V6
+ address prefix 2001:A::/64
+ dns-server 2001:4860:4860::8888
+ domain-name isepacademy.ccna.itn.com
+exit
+
+ipv6 dhcp pool WIRELESS-ZG-V6
+ address prefix 2001:A:0:1::/64
+ dns-server 2001:4860:4860::8888
+ domain-name isepacademy.ccna.itn.com
+exit
+
+ipv6 dhcp pool GUESTS-ZG-V6
+ address prefix 2001:A:0:4::/64
+ dns-server 2001:4860:4860::8888
+ domain-name isepacademy.ccna.itn.com
+exit
+
+end
+copy running-config startup-config
+
 ! ==============================================================================
 ! 2. MULTILAYER SWITCH 1: MLS1-Zg
 ! ==============================================================================
@@ -300,17 +433,14 @@ write memory
 ! ==============================================================================
 enable
 configure terminal
-
-! ---- Part 3: Initial Configuration ----
 no ip domain-lookup
-hostname MLS2-Zg
+hostname SW2-Zg
 ip domain-name isepacademy.ccna.itn.com
 security passwords min-length 10
 service password-encryption
 enable secret classclass
 username cisco secret classclass
-crypto key generate rsa
-2048
+crypto key generate rsa modulus 2048
 ip ssh version 2
 line console 0
  password classclass
@@ -322,24 +452,32 @@ line vty 0 15
  exec-timeout 0 30
 exit
 login block-for 300 attempts 3 within 120
-
 banner motd #
 AVISO: Acesso restrito a utilizadores autorizados. Todas as ligacoes sao monitorizadas e registadas. Qualquer tentativa de acesso nao autorizado sera reportada as autoridades competentes.
 #
 
-ip host RT1-Zg 10.0.0.5
-ip host RT1-Pl 10.0.0.9
+ip host RT1-Zg 172.20.7.97
 ip host MLS1-Zg 172.20.7.98
 ip host MLS2-Zg 172.20.7.102
 ip host SW1-Zg 172.20.7.4
-ip host SW2-Zg 172.20.7.5
+
+sdm prefer dual-ipv4-and-ipv6 default
+
+end
+copy running-config startup-config
+reload
 
 ! ---- Part 4: EtherChannel ----
 interface range GigabitEthernet1/0/2 - 3
  channel-group 1 mode on
 exit
 
-! ---- Part 5: VLANs e Trunks ----
+enable
+configure terminal
+
+! =========================================================
+! Part 5 — VLANs
+! =========================================================
 vlan 5
  name APs
 vlan 6
@@ -362,63 +500,123 @@ vlan 99
  name BLACKHOLE
 exit
 
-interface Port-channel 1
- switchport trunk encapsulation dot1q
- switchport mode trunk
- switchport trunk native vlan 7
- switchport trunk allowed vlan 5-60
+
+! =========================================================
+! Part 5b — Access ports (conforme enunciado, SW2-Zg)
+! =========================================================
+interface range FastEthernet0/1-10
+ switchport mode access
+ switchport access vlan 20
+ switchport voice vlan 40
  switchport nonegotiate
 exit
 
-interface range GigabitEthernet1/0/4 - 5
- switchport trunk encapsulation dot1q
- switchport mode trunk
- switchport trunk native vlan 7
- switchport trunk allowed vlan 5-60
+interface range FastEthernet0/11-20
+ switchport mode access
+ switchport access vlan 30
+ switchport voice vlan 40
  switchport nonegotiate
 exit
 
-interface range GigabitEthernet1/0/6 - 24
+interface range FastEthernet0/21-22
+ switchport mode trunk
+ switchport trunk native vlan 5
+ switchport trunk allowed vlan 5,50,60
+ switchport nonegotiate
+exit
+
+interface FastEthernet0/23
+ switchport mode trunk
+ switchport trunk native vlan 6
+ switchport trunk allowed vlan 5,6,50,60
+ switchport nonegotiate
+exit
+
+! Uplinks para MLS1/MLS2 (trunk, all VLANs except 99)
+interface GigabitEthernet0/1
+ description Trunk to MLS1-Zg
+ switchport mode trunk
+ switchport trunk native vlan 7
+ switchport trunk allowed vlan except 99
+ switchport nonegotiate
+exit
+
+interface GigabitEthernet0/2
+ description Trunk to MLS2-Zg
+ switchport mode trunk
+ switchport trunk native vlan 7
+ switchport trunk allowed vlan except 99
+ switchport nonegotiate
+exit
+
+! Portas não usadas
+interface FastEthernet0/24
  switchport mode access
  switchport access vlan 99
+ switchport nonegotiate
  shutdown
 exit
 
-! ---- Part 7: Spanning-Tree (Root Secondary) ----
-spanning-tree mode rapid-pvst
-spanning-tree vlan 40,50,60 root primary
-spanning-tree vlan 5,6,10,20,30 root secondary
 
-! ---- Part 8: DHCP Relay ----
-interface vlan 20
- ip helper-address 172.20.7.36
-interface vlan 30
- ip helper-address 172.20.7.36
-interface vlan 40
- ip helper-address 172.20.7.36
-interface vlan 50
- ip helper-address 172.20.7.36
-interface vlan 60
- ip helper-address 172.20.7.36
+! =========================================================
+! Part 6 — Management SVI
+! =========================================================
+interface Vlan6
+ description Management SVI
+ ip address 172.20.7.5 255.255.255.224
+ ipv6 address 2001:A:0:5::5/64
+ ipv6 address FE80::2:1 link-local
+ no shutdown
 exit
 
-! ---- Part 10: Seguranca (DHCP Snooping) ----
-ip dhcp snooping
-ip dhcp snooping vlan 5,6,10,20,30,40,50,60
-no ip dhcp snooping information option
+ip default-gateway 172.20.7.3
+ipv6 route ::/0 Vlan6 FE80::1:6
 
-interface range GigabitEthernet1/0/2 - 5
+
+! =========================================================
+! Part 7 — STP
+! =========================================================
+spanning-tree mode rapid-pvst
+
+
+! =========================================================
+! Part 10 — Segurança
+! =========================================================
+ip dhcp snooping
+ip dhcp snooping vlan 20,30,40,50,60
+
+interface range GigabitEthernet0/1-2
+ ip dhcp snooping trust
+exit
+interface range FastEthernet0/21-23
  ip dhcp snooping trust
 exit
 
-! ---- Part 11: Rota por Defeito ----
-ip routing
-ip route 0.0.0.0 0.0.0.0 172.20.7.97
+interface range FastEthernet0/1-20
+ switchport port-security
+ switchport port-security maximum 5
+ switchport port-security violation shutdown
+ switchport port-security aging time 5
+ switchport port-security aging type inactivity
+ ip dhcp snooping limit rate 5
+ spanning-tree bpduguard enable
+exit
+
+ip arp inspection vlan 20,30
+interface range FastEthernet0/1-20
+ ip arp inspection limit rate 5
+exit
+
+spanning-tree portfast default
+interface range GigabitEthernet0/1-2
+ spanning-tree portfast disable
+exit
+interface range FastEthernet0/21-23
+ spanning-tree portfast disable
+exit
 
 end
-write memory
-
-
+copy running-config startup-config
 ! ==============================================================================
 ! 4. SWITCH DE ACESSO 1: SW1-Zg
 ! ==============================================================================
