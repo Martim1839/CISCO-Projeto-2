@@ -343,12 +343,33 @@ ip host MLS2-Zg 172.20.7.102
 ip host SW1-Zg 172.20.7.4
 ip host SW2-Zg 172.20.7.5
 
-! ---- Part 4: EtherChannel ----
-interface range GigabitEthernet1/0/2 - 3
+enable
+configure terminal
+
+! =========================================================
+! Part 4 — EtherChannel Po1 ao MLS2-Zg
+! =========================================================
+interface range GigabitEthernet1/0/2-3
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport trunk native vlan 7
+ switchport trunk allowed vlan except 99
+ switchport nonegotiate
  channel-group 1 mode on
 exit
 
-! ---- Part 5: VLANs e Trunks ----
+interface Port-channel1
+ description EtherChannel to MLS2-Zg
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport trunk native vlan 7
+ switchport trunk allowed vlan except 99
+ switchport nonegotiate
+exit
+
+! =========================================================
+! Part 5 — VLANs e Portas Trunk para Acesso
+! =========================================================
 vlan 5
  name APs
 vlan 6
@@ -371,63 +392,232 @@ vlan 99
  name BLACKHOLE
 exit
 
-interface Port-channel 1
+interface GigabitEthernet1/0/4
+ description Trunk to SW1-Zg
  switchport trunk encapsulation dot1q
  switchport mode trunk
  switchport trunk native vlan 7
- switchport trunk allowed vlan 5-60
+ switchport trunk allowed vlan except 99
  switchport nonegotiate
 exit
 
-interface range GigabitEthernet1/0/4 - 5
+interface GigabitEthernet1/0/5
+ description Trunk to SW2-Zg
  switchport trunk encapsulation dot1q
  switchport mode trunk
  switchport trunk native vlan 7
- switchport trunk allowed vlan 5-60
+ switchport trunk allowed vlan except 99
  switchport nonegotiate
 exit
 
-interface range GigabitEthernet1/0/6 - 24
+interface range GigabitEthernet1/0/6-28
  switchport mode access
  switchport access vlan 99
+ switchport nonegotiate
  shutdown
 exit
 
-! ---- Part 7: Spanning-Tree (Root Primary) ----
+interface range TenGigabitEthernet1/0/1-2
+ switchport mode access
+ switchport access vlan 99
+ switchport nonegotiate
+ shutdown
+exit
+
+! =========================================================
+! Part 6 — Routing e SVIs
+! =========================================================
+ip routing
+ipv6 unicast-routing
+
+interface GigabitEthernet1/0/1
+ description Connection to RT1-Zg
+ no switchport
+ ip address 172.20.7.98 255.255.255.252
+ ipv6 address FE80::11 link-local
+ ipv6 enable
+ no shutdown
+exit
+
+interface Vlan5
+ description APs
+ ip address 172.20.7.65 255.255.255.224
+ ipv6 address 2001:A:0:7::1/64
+ ipv6 address FE80::1:5 link-local
+ no shutdown
+exit
+
+interface Vlan6
+ description Management
+ ip address 172.20.7.1 255.255.255.224
+ ipv6 address 2001:A:0:5::1/64
+ ipv6 address FE80::1:6 link-local
+ no shutdown
+exit
+
+interface Vlan10
+ description Servers
+ ip address 172.20.7.33 255.255.255.224
+ ipv6 address 2001:A:0:6::1/64
+ ipv6 address FE80::1:10 link-local
+ no shutdown
+exit
+
+interface Vlan20
+ description Administration
+ ip address 172.20.4.1 255.255.255.0
+ ipv6 address 2001:A:0:2::1/64
+ ipv6 address FE80::1:20 link-local
+ no shutdown
+exit
+
+interface Vlan30
+ description Staff
+ ip address 172.20.5.1 255.255.255.0
+ ipv6 address 2001:A:0:3::1/64
+ ipv6 address FE80::1:30 link-local
+ no shutdown
+exit
+
+interface Vlan40
+ description VoIP
+ ip address 172.20.0.1 255.255.254.0
+ ipv6 address 2001:A::1/64
+ ipv6 address FE80::1:40 link-local
+ no shutdown
+exit
+
+interface Vlan50
+ description Wireless
+ ip address 172.20.2.1 255.255.254.0
+ ipv6 address 2001:A:0:1::1/64
+ ipv6 address FE80::1:50 link-local
+ no shutdown
+exit
+
+interface Vlan60
+ description Guests
+ ip address 172.20.6.1 255.255.255.0
+ ipv6 address 2001:A:0:4::1/64
+ ipv6 address FE80::1:60 link-local
+ no shutdown
+exit
+
+! =========================================================
+! Part 7 — STP: MLS1 = Root Primário 5-30 / Secundário 40-60
+! =========================================================
 spanning-tree mode rapid-pvst
 spanning-tree vlan 5,6,10,20,30 root primary
 spanning-tree vlan 40,50,60 root secondary
 
-! ---- Part 8: DHCP Relay ----
-interface vlan 20
+! =========================================================
+! Part 8 — DHCP Relay para o DHCP-SRV
+! =========================================================
+interface range Vlan20, Vlan30, Vlan40, Vlan50, Vlan60
  ip helper-address 172.20.7.36
-interface vlan 30
- ip helper-address 172.20.7.36
-interface vlan 40
- ip helper-address 172.20.7.36
-interface vlan 50
- ip helper-address 172.20.7.36
-interface vlan 60
- ip helper-address 172.20.7.36
+ ipv6 dhcp relay destination 2001:A:0:6::5
+ ipv6 nd managed-config-flag
+ ipv6 nd other-config-flag
 exit
 
-! ---- Part 10: Seguranca (DHCP Snooping) ----
+! =========================================================
+! Part 9 — HSRPv2 (Corrigido para IPv6 Link-Local)
+! =========================================================
+interface Vlan5
+ standby version 2
+ standby 5 ip 172.20.7.67
+ standby 5 ipv6 FE80::3
+ standby 5 priority 110
+ standby 5 preempt
+exit
+
+interface Vlan6
+ standby version 2
+ standby 6 ip 172.20.7.3
+ standby 6 ipv6 FE80::3
+ standby 6 priority 110
+ standby 6 preempt
+exit
+
+interface Vlan10
+ standby version 2
+ standby 10 ip 172.20.7.35
+ standby 10 ipv6 FE80::3
+ standby 10 priority 110
+ standby 10 preempt
+exit
+
+interface Vlan20
+ standby version 2
+ standby 20 ip 172.20.4.3
+ standby 20 ipv6 FE80::3
+ standby 20 priority 110
+ standby 20 preempt
+exit
+
+interface Vlan30
+ standby version 2
+ standby 30 ip 172.20.5.3
+ standby 30 ipv6 FE80::3
+ standby 30 priority 110
+ standby 30 preempt
+exit
+
+interface Vlan40
+ standby version 2
+ standby 40 ip 172.20.0.3
+ standby 40 ipv6 FE80::3
+ standby 40 priority 90
+ standby 40 preempt
+exit
+
+interface Vlan50
+ standby version 2
+ standby 50 ip 172.20.2.3
+ standby 50 ipv6 FE80::3
+ standby 50 priority 90
+ standby 50 preempt
+exit
+
+interface Vlan60
+ standby version 2
+ standby 60 ip 172.20.6.3
+ standby 60 ipv6 FE80::3
+ standby 60 priority 90
+ standby 60 preempt
+exit
+
+
+! O enunciado pedia os VIPs globais, mas ao configurarmos o hardware físico (o 3750-E), o IOS rejeitou porque o HSRPv6 exige endereços Link-Local por norma. 
+!Por isso, adaptámos para FE80::3
+! =========================================================
+! Part 10 — Segurança e Finalização
+! =========================================================
 ip dhcp snooping
-ip dhcp snooping vlan 5,6,10,20,30,40,50,60
-no ip dhcp snooping information option
+ip dhcp snooping vlan 10,20,30,40,50,60
 
-interface range GigabitEthernet1/0/2 - 5
+interface range GigabitEthernet1/0/4-5
  ip dhcp snooping trust
+ ip arp inspection trust
 exit
 
-! ---- Part 11: Rota por Defeito ----
-ip routing
+interface Port-channel1
+ ip dhcp snooping trust
+ ip arp inspection trust
+exit
+
+ip arp inspection vlan 10,20,30
+
+spanning-tree portfast default
+interface range GigabitEthernet1/0/2-5
+ spanning-tree portfast disable
+exit
+
 ip route 0.0.0.0 0.0.0.0 172.20.7.97
+ipv6 route ::/0 GigabitEthernet1/0/1 FE80::1
 
 end
 write memory
-
-
 ! ==============================================================================
 ! 3. MULTILAYER SWITCH 2: MLS2-Zg
 ! ==============================================================================
