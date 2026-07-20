@@ -618,7 +618,7 @@ exit
 end
 copy running-config startup-config
 ! ==============================================================================
-! 4. SWITCH DE ACESSO 1: SW1-Zg
+! SWITCH DE ACESSO 1: SW1-Zg
 ! ==============================================================================
 enable
 configure terminal
@@ -708,8 +708,21 @@ exit
 interface range FastEthernet0/21 - 24
  switchport mode access
  switchport access vlan 99
+ switchport nonegotiate
  shutdown
 exit
+
+! ---- Part 6: Management SVI (FALTAVA) ----
+interface Vlan6
+ description Management SVI
+ ip address 172.20.7.4 255.255.255.224
+ ipv6 address 2001:A:0:5::4/64
+ ipv6 address FE80::1:1 link-local
+ no shutdown
+exit
+
+ip default-gateway 172.20.7.3
+ipv6 route ::/0 Vlan6 FE80::1:6
 
 ! ---- Part 10: Seguranca Layer 2 ----
 interface range FastEthernet0/1 - 20
@@ -717,6 +730,7 @@ interface range FastEthernet0/1 - 20
  switchport port-security maximum 5
  switchport port-security violation shutdown
  switchport port-security aging time 5
+ switchport port-security aging type inactivity
  spanning-tree portfast
  spanning-tree bpduguard enable
 exit
@@ -737,11 +751,11 @@ exit
 ip arp inspection vlan 10,20,30
 
 end
-write memory
+copy running-config startup-config
 
 
 ! ==============================================================================
-! 5. SWITCH DE ACESSO 2: SW2-Zg
+! SWITCH DE ACESSO 2: SW2-Zg
 ! ==============================================================================
 enable
 configure terminal
@@ -801,40 +815,95 @@ vlan 99
  name BLACKHOLE
 exit
 
-interface range GigabitEthernet0/1 - 2
- switchport mode trunk
- switchport trunk native vlan 6
- switchport trunk allowed vlan 5,6,50,60
+interface range FastEthernet0/1-10
+ switchport mode access
+ switchport access vlan 20
+ switchport voice vlan 40
  switchport nonegotiate
 exit
 
-interface range FastEthernet0/21 - 22
+interface range FastEthernet0/11-20
+ switchport mode access
+ switchport access vlan 30
+ switchport voice vlan 40
+ switchport nonegotiate
+exit
+
+interface range FastEthernet0/21-22
  switchport mode trunk
  switchport trunk native vlan 5
  switchport trunk allowed vlan 5,50,60
  switchport nonegotiate
 exit
 
-interface range FastEthernet0/1 - 20
+interface FastEthernet0/23
+ switchport mode trunk
+ switchport trunk native vlan 6
+ switchport trunk allowed vlan 5,6,50,60
+ switchport nonegotiate
+exit
+
+interface GigabitEthernet0/1-2
+ description Trunk to MLS1-Zg
+ switchport mode trunk
+ switchport trunk native vlan 7
+ switchport trunk allowed vlan except 99
+ switchport nonegotiate
+exit
+
+interface FastEthernet0/24
  switchport mode access
  switchport access vlan 99
+ switchport nonegotiate
  shutdown
 exit
 
-interface range FastEthernet0/23 - 24
- switchport mode access
- switchport access vlan 99
- shutdown
+! ---- Part 6: Management SVI ----
+interface Vlan6
+ description Management SVI
+ ip address 172.20.7.5 255.255.255.224
+ ipv6 address 2001:A:0:5::5/64
+ ipv6 address FE80::1:6 link-local
+ no shutdown
 exit
 
-! ---- Part 10: Seguranca Layer 2 ----
+ip default-gateway 172.20.7.3
+ipv6 route ::/0 Vlan6 FE80::1:6
+
+! ---- Part 10: Seguranca ----
 ip dhcp snooping
-ip dhcp snooping vlan 5,6,10,20,30,40,50,60
-no ip dhcp snooping information option
+ip dhcp snooping vlan 20,30,40,50,60
 
-interface range GigabitEthernet0/1 - 2
+interface range GigabitEthernet0/1-2
+ ip dhcp snooping trust
+ ip arp inspection trust
+exit
+interface range FastEthernet0/21-23
  ip dhcp snooping trust
 exit
 
+interface range FastEthernet0/1-20
+ switchport port-security
+ switchport port-security maximum 5
+ switchport port-security violation shutdown
+ switchport port-security aging time 5
+ switchport port-security aging type inactivity
+ ip dhcp snooping limit rate 5
+ spanning-tree bpduguard enable
+exit
+
+ip arp inspection vlan 20,30
+interface range FastEthernet0/1-20
+ ip arp inspection limit rate 5
+exit
+
+spanning-tree portfast default
+interface range GigabitEthernet0/1-2
+ spanning-tree portfast disable
+exit
+interface range FastEthernet0/21-23
+ spanning-tree portfast disable
+exit
+
 end
-write memory
+copy running-config startup-config
