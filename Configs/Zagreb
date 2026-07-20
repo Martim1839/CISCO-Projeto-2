@@ -433,8 +433,9 @@ write memory
 ! ==============================================================================
 enable
 configure terminal
+
 no ip domain-lookup
-hostname SW2-Zg
+hostname MLS2-Zg
 ip domain-name isepacademy.ccna.itn.com
 security passwords min-length 10
 service password-encryption
@@ -456,27 +457,41 @@ banner motd #
 AVISO: Acesso restrito a utilizadores autorizados. Todas as ligacoes sao monitorizadas e registadas. Qualquer tentativa de acesso nao autorizado sera reportada as autoridades competentes.
 #
 
-ip host RT1-Zg 172.20.7.97
+ip host RT1-Zg 172.20.7.101
 ip host MLS1-Zg 172.20.7.98
-ip host MLS2-Zg 172.20.7.102
 ip host SW1-Zg 172.20.7.4
+ip host SW2-Zg 172.20.7.5
 
 sdm prefer dual-ipv4-and-ipv6 default
-
 end
-copy running-config startup-config
+write memory
 reload
-
-! ---- Part 4: EtherChannel ----
-interface range GigabitEthernet1/0/2 - 3
- channel-group 1 mode on
-exit
-
 enable
 configure terminal
 
 ! =========================================================
-! Part 5 — VLANs
+! Part 4 — EtherChannel Po1 ao MLS1-Zg
+! =========================================================
+interface range GigabitEthernet1/0/2-3
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport trunk native vlan 7
+ switchport trunk allowed vlan except 99
+ switchport nonegotiate
+ channel-group 1 mode on
+exit
+
+interface Port-channel1
+ description EtherChannel to MLS1-Zg
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport trunk native vlan 7
+ switchport trunk allowed vlan except 99
+ switchport nonegotiate
+exit
+
+! =========================================================
+! Part 5 — VLANs e Portas Trunk para Acesso
 ! =========================================================
 vlan 5
  name APs
@@ -500,123 +515,217 @@ vlan 99
  name BLACKHOLE
 exit
 
-
-! =========================================================
-! Part 5b — Access ports (conforme enunciado, SW2-Zg)
-! =========================================================
-interface range FastEthernet0/1-10
- switchport mode access
- switchport access vlan 20
- switchport voice vlan 40
- switchport nonegotiate
-exit
-
-interface range FastEthernet0/11-20
- switchport mode access
- switchport access vlan 30
- switchport voice vlan 40
- switchport nonegotiate
-exit
-
-interface range FastEthernet0/21-22
- switchport mode trunk
- switchport trunk native vlan 5
- switchport trunk allowed vlan 5,50,60
- switchport nonegotiate
-exit
-
-interface FastEthernet0/23
- switchport mode trunk
- switchport trunk native vlan 6
- switchport trunk allowed vlan 5,6,50,60
- switchport nonegotiate
-exit
-
-! Uplinks para MLS1/MLS2 (trunk, all VLANs except 99)
-interface GigabitEthernet0/1
- description Trunk to MLS1-Zg
+interface GigabitEthernet1/0/4
+ description Trunk to SW1-Zg
+ switchport trunk encapsulation dot1q
  switchport mode trunk
  switchport trunk native vlan 7
  switchport trunk allowed vlan except 99
  switchport nonegotiate
 exit
 
-interface GigabitEthernet0/2
- description Trunk to MLS2-Zg
+interface GigabitEthernet1/0/5
+ description Trunk to SW2-Zg
+ switchport trunk encapsulation dot1q
  switchport mode trunk
  switchport trunk native vlan 7
  switchport trunk allowed vlan except 99
  switchport nonegotiate
 exit
 
-! Portas não usadas
-interface FastEthernet0/24
+interface range GigabitEthernet1/0/6-28
  switchport mode access
  switchport access vlan 99
  switchport nonegotiate
  shutdown
 exit
 
+interface range TenGigabitEthernet1/0/1-2
+ switchport mode access
+ switchport access vlan 99
+ switchport nonegotiate
+ shutdown
+exit
 
 ! =========================================================
-! Part 6 — Management SVI
+! Part 6 — Routing e SVIs
 ! =========================================================
-interface Vlan6
- description Management SVI
- ip address 172.20.7.5 255.255.255.224
- ipv6 address 2001:A:0:5::5/64
- ipv6 address FE80::2:1 link-local
+ip routing
+ipv6 unicast-routing
+
+interface GigabitEthernet1/0/1
+ description Connection to RT1-Zg
+ no switchport
+ ip address 172.20.7.102 255.255.255.252
+ ipv6 address FE80::22 link-local
+ ipv6 enable
  no shutdown
 exit
 
-ip default-gateway 172.20.7.3
-ipv6 route ::/0 Vlan6 FE80::1:6
+interface Vlan5
+ description APs
+ ip address 172.20.7.66 255.255.255.224
+ ipv6 address 2001:A:0:7::2/64
+ ipv6 address FE80::2:5 link-local
+ no shutdown
+exit
 
+interface Vlan6
+ description Management
+ ip address 172.20.7.2 255.255.255.224
+ ipv6 address 2001:A:0:5::2/64
+ ipv6 address FE80::2:6 link-local
+ no shutdown
+exit
+
+interface Vlan10
+ description Servers
+ ip address 172.20.7.34 255.255.255.224
+ ipv6 address 2001:A:0:6::2/64
+ ipv6 address FE80::2:10 link-local
+ no shutdown
+exit
+
+interface Vlan20
+ description Administration
+ ip address 172.20.4.2 255.255.255.0
+ ipv6 address 2001:A:0:2::2/64
+ ipv6 address FE80::2:20 link-local
+ no shutdown
+exit
+
+interface Vlan30
+ description Staff
+ ip address 172.20.5.2 255.255.255.0
+ ipv6 address 2001:A:0:3::2/64
+ ipv6 address FE80::2:30 link-local
+ no shutdown
+exit
+
+interface Vlan40
+ description VoIP
+ ip address 172.20.0.2 255.255.254.0
+ ipv6 address 2001:A::2/64
+ ipv6 address FE80::2:40 link-local
+ no shutdown
+exit
+
+interface Vlan50
+ description Wireless
+ ip address 172.20.2.2 255.255.254.0
+ ipv6 address 2001:A:0:1::2/64
+ ipv6 address FE80::2:50 link-local
+ no shutdown
+exit
+
+interface Vlan60
+ description Guests
+ ip address 172.20.6.2 255.255.255.0
+ ipv6 address 2001:A:0:4::2/64
+ ipv6 address FE80::2:60 link-local
+ no shutdown
+exit
 
 ! =========================================================
-! Part 7 — STP
+! Part 7 — STP: MLS2 = Root Secundário 5-30 / Primário 40-60
 ! =========================================================
 spanning-tree mode rapid-pvst
-
+spanning-tree vlan 5,6,10,20,30 root secondary
+spanning-tree vlan 40,50,60 root primary
 
 ! =========================================================
-! Part 10 — Segurança
+! Part 8 — DHCP Relay
+! =========================================================
+interface range Vlan20, Vlan30, Vlan40, Vlan50, Vlan60
+ ip helper-address 172.20.7.36
+ ipv6 dhcp relay destination 2001:A:0:6::5
+ ipv6 nd managed-config-flag
+ ipv6 nd other-config-flag
+exit
+
+! =========================================================
+! Part 9 — HSRPv2 (MLS2 = STANDBY 5-30 / ACTIVE 40-60)
+! =========================================================
+interface Vlan5
+ standby version 2
+ standby 5 ip 172.20.7.67
+ standby 5 ipv6 2001:A:0:7::3
+ standby 5 priority 90
+exit
+interface Vlan6
+ standby version 2
+ standby 6 ip 172.20.7.3
+ standby 6 ipv6 2001:A:0:5::3
+ standby 6 priority 90
+exit
+interface Vlan10
+ standby version 2
+ standby 10 ip 172.20.7.35
+ standby 10 ipv6 2001:A:0:6::3
+ standby 10 priority 90
+exit
+interface Vlan20
+ standby version 2
+ standby 20 ip 172.20.4.3
+ standby 20 ipv6 2001:A:0:2::3
+ standby 20 priority 90
+exit
+interface Vlan30
+ standby version 2
+ standby 30 ip 172.20.5.3
+ standby 30 ipv6 2001:A:0:3::3
+ standby 30 priority 90
+exit
+interface Vlan40
+ standby version 2
+ standby 40 ip 172.20.0.3
+ standby 40 ipv6 2001:A::3
+ standby 40 priority 110
+ standby 40 preempt
+exit
+interface Vlan50
+ standby version 2
+ standby 50 ip 172.20.2.3
+ standby 50 ipv6 2001:A:0:1::3
+ standby 50 priority 110
+ standby 50 preempt
+exit
+interface Vlan60
+ standby version 2
+ standby 60 ip 172.20.6.3
+ standby 60 ipv6 2001:A:0:4::3
+ standby 60 priority 110
+ standby 60 preempt
+exit
+
+! =========================================================
+! Part 10 — Segurança e Routing Final
 ! =========================================================
 ip dhcp snooping
-ip dhcp snooping vlan 20,30,40,50,60
+ip dhcp snooping vlan 10,20,30,40,50,60
 
-interface range GigabitEthernet0/1-2
+interface range GigabitEthernet1/0/4-5
  ip dhcp snooping trust
+ ip arp inspection trust
 exit
-interface range FastEthernet0/21-23
+
+interface Port-channel1
  ip dhcp snooping trust
+ ip arp inspection trust
 exit
 
-interface range FastEthernet0/1-20
- switchport port-security
- switchport port-security maximum 5
- switchport port-security violation shutdown
- switchport port-security aging time 5
- switchport port-security aging type inactivity
- ip dhcp snooping limit rate 5
- spanning-tree bpduguard enable
-exit
-
-ip arp inspection vlan 20,30
-interface range FastEthernet0/1-20
- ip arp inspection limit rate 5
-exit
+ip arp inspection vlan 10,20,30
 
 spanning-tree portfast default
-interface range GigabitEthernet0/1-2
- spanning-tree portfast disable
-exit
-interface range FastEthernet0/21-23
+interface range GigabitEthernet1/0/2-5
  spanning-tree portfast disable
 exit
 
+ip route 0.0.0.0 0.0.0.0 172.20.7.101
+ipv6 route ::/0 GigabitEthernet1/0/1 FE80::2
+
 end
-copy running-config startup-config
+write memory
 ! ==============================================================================
 ! SWITCH DE ACESSO 1: SW1-Zg
 ! ==============================================================================
