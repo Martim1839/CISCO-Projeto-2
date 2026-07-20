@@ -19,46 +19,40 @@ show sdm prefer
 
 - if necessary 
 configure terminal
-sdm prefer dual-ipv4-and-ipv6 default
+sdm prefer dual-ipv4-and-ipv6
 end
-copy running-config startup-config (ou simplesmente yes no reload)
-reload (no save)
+copy running-config startup-config
+reload
 
 ## Parte 3 -  Perform Equipment Initial Configuration (Router e Switch)
 
-### Router (RT1-St) e Switch (SW1-St)
+### Router (RT1-St)
 
 enable
 configure terminal
 no ip domain-lookup
-hostname SW1-St | RT1-St
+hostname RT1-St
 ip domain-name isepacademy.ccna.itn.com
-security passwords min-length 10 (no switch não dá)
+security passwords min-length 10
 service password-encryption
 enable secret classclass
 username cisco privilege 15 secret classclass
-
-crypto key generate rsa
-2048
-
+crypto key generate rsa modulus 1024
 ip ssh version 2
 line console 0
  password classclass
  login
 exit
 line vty 0 15
- transport input ssh
- login local
  exec-timeout 0 30
+ login local
+ transport input ssh
 exit
-
-login block-for 300 attempts 3 within 120  (no switch não dá)
-
+login block-for 300 attempts 3 within 120
 banner motd #
 AVISO: Acesso restrito a pessoal autorizado.
 Todas as tentativas de acesso sao registadas e monitorizadas.
 #
-
 ip host RT1-Zg 172.20.7.97
 ip host RT1-Pl 10.0.0.2
 ip host RT1-St 10.0.0.6
@@ -68,7 +62,45 @@ ip host SW1-Zg 172.20.7.4
 ip host SW2-Zg 172.20.7.5
 ip host SW1-Pl 172.20.11.106
 ip host SW1-St 172.20.13.234
+end
+copy running-config startup-config
 
+(VERIFICAR AQUI: show running-config | include hostname -> tem de mostrar "hostname RT1-St")
+
+### Switch (SW1-St)
+
+enable
+configure terminal
+no ip domain-lookup
+hostname SW1-St
+ip domain-name isepacademy.ccna.itn.com
+service password-encryption
+enable secret classclass
+username cisco privilege 15 secret classclass
+crypto key generate rsa modulus 1024
+ip ssh version 2
+line console 0
+ password classclass
+ login
+exit
+line vty 0 15
+ exec-timeout 0 30
+ login local
+ transport input ssh
+exit
+banner motd #
+AVISO: Acesso restrito a pessoal autorizado.
+Todas as tentativas de acesso sao registadas e monitorizadas.
+#
+ip host RT1-Zg 172.20.7.97
+ip host RT1-Pl 10.0.0.2
+ip host RT1-St 10.0.0.6
+ip host MLS1-Zg 172.20.7.98
+ip host MLS2-Zg 172.20.7.102
+ip host SW1-Zg 172.20.7.4
+ip host SW2-Zg 172.20.7.5
+ip host SW1-Pl 172.20.11.106
+ip host SW1-St 172.20.13.234
 end
 copy running-config startup-config
 
@@ -78,7 +110,6 @@ copy running-config startup-config
 ###Switch(SW1-St)
 
 #### a. Criar Vlan
-
 
 enable
 configure terminal
@@ -122,7 +153,14 @@ interface range FastEthernet0/2 - 15
 exit
 
 - Ap1-St
-interface range FastEthernet0/21 - 22
+interface FastEthernet0/21
+ switchport mode trunk
+ switchport trunk native vlan 5
+ switchport trunk allowed vlan 5,50,60
+ switchport nonegotiate
+ no shutdown
+exit
+interface FastEthernet0/22
  switchport mode trunk
  switchport trunk native vlan 5
  switchport trunk allowed vlan 5,50,60
@@ -138,7 +176,13 @@ interface range FastEthernet0/16 - 20
  shutdown
 exit
 
-interface range FastEthernet0/23 - 24
+interface FastEthernet0/23
+ switchport mode access
+ switchport access vlan 99
+ switchport nonegotiate
+ shutdown
+exit
+interface FastEthernet0/24
  switchport mode access
  switchport access vlan 99
  switchport nonegotiate
@@ -155,9 +199,8 @@ show interfaces trunk
 show interfaces status
 
 
-
-
-# Parte 6 - Configure IPv4 and IPv6 on the Interfaces, Sub-Interfaces and SWIs (Router e Switch) - depende das portas físicas
+# Parte 6 - Configure IPv4 and IPv6 on the Interfaces, Sub-Interfaces and SWIs (Router e Switch)
+# ROUTER ATUAL: Gig0/1 = LAN (liga ao SW1-St) | Gig0/2 = WAN (liga ao SW0)
 
 ### Router (RT1-St)
 
@@ -165,13 +208,13 @@ enable
 configure terminal
 ipv6 unicast-routing
 
-interface GigabitEthernet0/0
+interface GigabitEthernet0/1
  description Link to SW1-St (LAN VLANs)
  no ip address
  no shutdown
 exit
 
-interface GigabitEthernet0/0.5
+interface GigabitEthernet0/1.5
  description APs (Split)
  encapsulation dot1Q 5
  ip address 172.20.13.225 255.255.255.248
@@ -180,7 +223,7 @@ interface GigabitEthernet0/0.5
  ipv6 enable
 exit
 
-interface GigabitEthernet0/0.6
+interface GigabitEthernet0/1.6
  description Management (Split)
  encapsulation dot1Q 6
  ip address 172.20.13.233 255.255.255.248
@@ -189,7 +232,7 @@ interface GigabitEthernet0/0.6
  ipv6 enable
 exit
 
-interface GigabitEthernet0/0.30
+interface GigabitEthernet0/1.30
  description Staff (Split)
  encapsulation dot1Q 30
  ip address 172.20.12.1 255.255.255.128
@@ -198,7 +241,7 @@ interface GigabitEthernet0/0.30
  ipv6 enable
 exit
 
-interface GigabitEthernet0/0.50
+interface GigabitEthernet0/1.50
  description Wireless-St
  encapsulation dot1Q 50
  ip address 172.20.12.129 255.255.255.128
@@ -207,7 +250,7 @@ interface GigabitEthernet0/0.50
  ipv6 enable
 exit
 
-interface GigabitEthernet0/0.60
+interface GigabitEthernet0/1.60
  description Guests-St
  encapsulation dot1Q 60
  ip address 172.20.13.193 255.255.255.224
@@ -216,12 +259,13 @@ interface GigabitEthernet0/0.60
  ipv6 enable
 exit
 
-interface GigabitEthernet0/1
+interface GigabitEthernet0/2
+ description Trunk to SW0 (Inter-router WAN)
  no ip address
  no shutdown
 exit
 
-interface GigabitEthernet0/1.103
+interface GigabitEthernet0/2.103
  description Connection to RT1-Zg
  encapsulation dot1Q 103
  ip address 10.0.0.6 255.255.255.252
@@ -229,7 +273,7 @@ interface GigabitEthernet0/1.103
  ipv6 enable
 exit
 
-interface GigabitEthernet0/1.203
+interface GigabitEthernet0/2.203
  description Connection to RT1-Pl
  encapsulation dot1Q 203
  ip address 10.0.0.10 255.255.255.252
@@ -257,6 +301,8 @@ exit
 
 end
 copy running-config startup-config
+
+(VERIFICAR AQUI: show ip interface brief / show ipv6 interface brief)
 
 ###Switch(SW1-St)
 
@@ -341,21 +387,21 @@ ipv6 dhcp pool GUESTS-ST-V6
  domain-name isepacademy.ccna.itn.com
 exit
 
-! ===== Ativar DHCPv6 nas sub-interfaces =====
+! ===== Ativar DHCPv6 nas sub-interfaces (Gig0/1 = LAN) =====
 
-interface GigabitEthernet0/0.30
+interface GigabitEthernet0/1.30
  ipv6 dhcp server STAFF-ST-V6
  ipv6 nd managed-config-flag
  ipv6 nd other-config-flag
 exit
 
-interface GigabitEthernet0/0.50
+interface GigabitEthernet0/1.50
  ipv6 dhcp server WIRELESS-ST-V6
  ipv6 nd managed-config-flag
  ipv6 nd other-config-flag
 exit
 
-interface GigabitEthernet0/0.60
+interface GigabitEthernet0/1.60
  ipv6 dhcp server GUESTS-ST-V6
  ipv6 nd managed-config-flag
  ipv6 nd other-config-flag
@@ -373,8 +419,6 @@ copy running-config startup-config
 show interfaces status | include disabled
 
 #### b. Port security nas portas de acesso Vlan 30 que é o que tem porta de acesso real
-
-- Vlan 30
 
 enable
 configure terminal
@@ -411,10 +455,7 @@ interface range FastEthernet0/2 - 15
 exit
 
 #### e. PortFast
-interface range FastEthernet0/2 - 15
-spanning-tree portfast
-exit
-
+spanning-tree portfast default
 
 #### f.BPDU Guard
 
@@ -430,13 +471,12 @@ copy running-config startup-config
 show port-security interface FastEthernet0/2
 show ip dhcp snooping
 show ip arp inspection vlan 30
-show spanning-tree interface FastEthernet0/2 detail
 show spanning-tree summary
 show running-config interface FastEthernet0/2
 
 
-
-#Parte 11 - Configure Static Routes (Router) - depende das portas físicas
+#Parte 11 - Configure Static Routes (Router)
+# Gig0/2 = WAN (liga ao SW0)
 
 #### a.  Rotas entre localidades (RT1-St)
 
@@ -451,16 +491,15 @@ ip route 172.20.0.0 255.255.248.0 10.0.0.9 200
 ip route 172.20.8.0 255.255.252.0 10.0.0.9
 ip route 172.20.8.0 255.255.252.0 10.0.0.5 200
 
-! IPv6 — para Zagreb e Pula (next-hop = vizinho, sufixo próprio do vizinho)
-ipv6 route 2001:A::/61 GigabitEthernet0/1.103 FE80::103:1
-ipv6 route 2001:A::/61 GigabitEthernet0/1.203 FE80::203:2 200
-ipv6 route 2001:B::/61 GigabitEthernet0/1.203 FE80::203:2
-ipv6 route 2001:B::/61 GigabitEthernet0/1.103 FE80::103:1 200
+! IPv6 — para Zagreb e Pula (next-hop = vizinho, sufixo próprio do vizinho: :1=Zagreb, :2=Pula, :3=Split)
+ipv6 route 2001:A::/61 GigabitEthernet0/2.103 FE80::103:1
+ipv6 route 2001:A::/61 GigabitEthernet0/2.203 FE80::203:2 200
+ipv6 route 2001:B::/61 GigabitEthernet0/2.203 FE80::203:2
+ipv6 route 2001:B::/61 GigabitEthernet0/2.103 FE80::103:1 200
 
 - Guardar
 end
 copy running-config startup-config
-
 
 
 Confirmar Router-St:
@@ -472,19 +511,15 @@ show ip ssh
 
 Parte 6:
 show ip interface brief
-
 show ipv6 interface brief
 
 Parte 8:
 show ip dhcp pool
-
 show ipv6 dhcp pool
-
 show ipv6 dhcp interface
 
 Parte 11:
 show ip route static
-
 show ipv6 route static
 
 Teste de conectividade:
