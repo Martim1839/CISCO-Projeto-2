@@ -1,33 +1,41 @@
-# Split - Configurações (RT1-St / SW1-St)
+# Split — Configurações (RT1-St / SW1-St)
 
-## Parte 2 - Clear Configs and reload equipment (Router e Switch)
 
-### Router(RT1-St)
+## Parte 2 — Clear Configs and reload equipment (Rt e Sw)
+
+### Router (RT1-St)
+```
 enable
-erase startup-config (enter)
-reload (no save)
+erase startup-config
+reload
+```
 
-### Switch(Sw1-St)  
+### Switch (SW1-St)
+```
 enable
-erase startup-config (enter)
-delete flash:vlan.dat (enter enter)
-reload (no save)
+erase startup-config
+delete flash:vlan.dat
+reload
+```
 
-- check SDM
+### Ajustar SDM Template (se necessário)
+```
 enable
 show sdm prefer
 
-- if necessary 
 configure terminal
-sdm prefer dual-ipv4-and-ipv6
+sdm prefer dual-ipv4-and-ipv6 default
 end
 copy running-config startup-config
 reload
+```
 
-## Parte 3 -  Perform Equipment Initial Configuration (Router e Switch)
+---
+
+## Parte 3 — Perform Equipment Initial Configuration (Rt e Sw)
 
 ### Router (RT1-St)
-
+```
 enable
 configure terminal
 no ip domain-lookup
@@ -64,11 +72,10 @@ ip host SW1-Pl 172.20.11.106
 ip host SW1-St 172.20.13.234
 end
 copy running-config startup-config
-
-(VERIFICAR AQUI: show running-config | include hostname -> tem de mostrar "hostname RT1-St")
+```
 
 ### Switch (SW1-St)
-
+```
 enable
 configure terminal
 no ip domain-lookup
@@ -88,6 +95,7 @@ line vty 0 15
  login local
  transport input ssh
 exit
+login block-for 300 attempts 3 within 120
 banner motd #
 AVISO: Acesso restrito a pessoal autorizado.
 Todas as tentativas de acesso sao registadas e monitorizadas.
@@ -103,14 +111,16 @@ ip host SW1-Pl 172.20.11.106
 ip host SW1-St 172.20.13.234
 end
 copy running-config startup-config
+```
 
+---
 
-## Parte 5 -  Configure VLANs, Trunks and Access Ports (Switch) - depende das portas físicas
+## Parte 5 — Configure VLANs, Trunks and Access Ports (Sw)
 
-###Switch(SW1-St)
+### Switch (SW1-St)
 
-#### a. Criar Vlan
-
+#### a. Criar VLANs
+```
 enable
 configure terminal
 vlan 5
@@ -134,9 +144,12 @@ vlan 60
 vlan 99
  name BLACKHOLE
 exit
+```
 
 #### b. Configurar trunks e portas de acesso
--RT1-St
+
+**Trunk para RT1-St:**
+```
 interface FastEthernet0/1
  switchport mode trunk
  switchport trunk native vlan 7
@@ -144,15 +157,19 @@ interface FastEthernet0/1
  switchport nonegotiate
  no shutdown
 exit
+```
 
-- PCD
+**PCD (acesso VLAN 30):**
+```
 interface range FastEthernet0/2 - 15
  switchport mode access
  switchport access vlan 30
  switchport nonegotiate
 exit
+```
 
-- Ap1-St
+**AP1-St (trunks):**
+```
 interface FastEthernet0/21
  switchport mode trunk
  switchport trunk native vlan 5
@@ -167,8 +184,10 @@ interface FastEthernet0/22
  switchport nonegotiate
  no shutdown
 exit
+```
 
-- Portas não usadas - Vlan 99(blackhole) e shutdown
+**Portas não usadas — VLAN 99 (blackhole) + shutdown:**
+```
 interface range FastEthernet0/16 - 20
  switchport mode access
  switchport access vlan 99
@@ -182,28 +201,29 @@ interface FastEthernet0/23
  switchport nonegotiate
  shutdown
 exit
+
 interface FastEthernet0/24
  switchport mode access
  switchport access vlan 99
  switchport nonegotiate
  shutdown
 exit
+```
 
-- Gravar
+**Gravar:**
+```
 end
 copy running-config startup-config
+```
 
-- Verificar
-show vlan brief
-show interfaces trunk
-show interfaces status
+---
 
+## Parte 6 — Configure IPv4 and IPv6 on the Interfaces, Sub-Interfaces and SWIs (Rt e Sw)
 
-# Parte 6 - Configure IPv4 and IPv6 on the Interfaces, Sub-Interfaces and SWIs (Router e Switch)
-# ROUTER ATUAL: Gig0/1 = LAN (liga ao SW1-St) | Gig0/2 = WAN (liga ao SW0)
+> RT1-St: `Gig0/1` = LAN (liga ao SW1-St) | `Gig0/2` = WAN (liga ao SW0)
 
 ### Router (RT1-St)
-
+```
 enable
 configure terminal
 ipv6 unicast-routing
@@ -219,8 +239,9 @@ interface GigabitEthernet0/1.5
  encapsulation dot1Q 5
  ip address 172.20.13.225 255.255.255.248
  ipv6 address 2001:C:0:6::1/64
- ipv6 address FE80::1 link-local
+ ipv6 address FE80::5 link-local
  ipv6 enable
+ no shutdown
 exit
 
 interface GigabitEthernet0/1.6
@@ -228,8 +249,9 @@ interface GigabitEthernet0/1.6
  encapsulation dot1Q 6
  ip address 172.20.13.233 255.255.255.248
  ipv6 address 2001:C:0:7::1/64
- ipv6 address FE80::1 link-local
+ ipv6 address FE80::6 link-local
  ipv6 enable
+ no shutdown
 exit
 
 interface GigabitEthernet0/1.30
@@ -237,8 +259,9 @@ interface GigabitEthernet0/1.30
  encapsulation dot1Q 30
  ip address 172.20.12.1 255.255.255.128
  ipv6 address 2001:C::1/64
- ipv6 address FE80::1 link-local
+ ipv6 address FE80::30 link-local
  ipv6 enable
+ no shutdown
 exit
 
 interface GigabitEthernet0/1.50
@@ -246,8 +269,9 @@ interface GigabitEthernet0/1.50
  encapsulation dot1Q 50
  ip address 172.20.12.129 255.255.255.128
  ipv6 address 2001:C:0:1::1/64
- ipv6 address FE80::1 link-local
+ ipv6 address FE80::50 link-local
  ipv6 enable
+ no shutdown
 exit
 
 interface GigabitEthernet0/1.60
@@ -255,8 +279,9 @@ interface GigabitEthernet0/1.60
  encapsulation dot1Q 60
  ip address 172.20.13.193 255.255.255.224
  ipv6 address 2001:C:0:5::1/64
- ipv6 address FE80::1 link-local
+ ipv6 address FE80::60 link-local
  ipv6 enable
+ no shutdown
 exit
 
 interface GigabitEthernet0/2
@@ -271,6 +296,7 @@ interface GigabitEthernet0/2.103
  ip address 10.0.0.6 255.255.255.252
  ipv6 address FE80::103:3 link-local
  ipv6 enable
+ no shutdown
 exit
 
 interface GigabitEthernet0/2.203
@@ -279,33 +305,36 @@ interface GigabitEthernet0/2.203
  ip address 10.0.0.10 255.255.255.252
  ipv6 address FE80::203:3 link-local
  ipv6 enable
+ no shutdown
 exit
 
 interface Loopback0
  description Multimedia (LAN simulada)
  ip address 172.20.13.1 255.255.255.192
  ipv6 address 2001:C:0:2::1/64
+ no shutdown
 exit
 
 interface Loopback1
  description Design (LAN simulada)
  ip address 172.20.13.65 255.255.255.192
  ipv6 address 2001:C:0:3::1/64
+ no shutdown
 exit
 
 interface Loopback2
  description Communication (LAN simulada)
  ip address 172.20.13.129 255.255.255.192
  ipv6 address 2001:C:0:4::1/64
+ no shutdown
 exit
 
 end
 copy running-config startup-config
+```
 
-(VERIFICAR AQUI: show ip interface brief / show ipv6 interface brief)
-
-###Switch(SW1-St)
-
+### Switch (SW1-St)
+```
 enable
 configure terminal
 interface Vlan6
@@ -317,30 +346,34 @@ interface Vlan6
  no shutdown
 exit
 ip default-gateway 172.20.13.233
-ipv6 route ::/0 Vlan6 FE80::1 
+ipv6 route ::/0 Vlan6 FE80::6
 end
 copy running-config startup-config
+```
 
-# Parte 7 - Adjust STP Default Configuration (Switch)
-###Switch(SW1-St)
+---
 
+## Parte 7 — Adjust STP Default Configuration (Sw)
+
+### Switch (SW1-St)
+```
 enable
 configure terminal
 spanning-tree mode rapid-pvst
 end
 copy running-config startup-config
+```
 
--confirmar
-show spanning-tree summary
+---
 
-# Parte 8 - Implement DHCPv4 and DHCPv6 (Router)
+## Parte 8 — Implement DHCPv4 and DHCPv6 (Rt)
 
 ### Router (RT1-St)
 
+**DHCPv4:**
+```
 enable
 configure terminal
-
-! ===== DHCPv4 =====
 
 ip dhcp excluded-address 172.20.12.1
 ip dhcp excluded-address 172.20.12.129
@@ -366,9 +399,10 @@ ip dhcp pool GUESTS-ST
  dns-server 172.20.7.36
  domain-name isepacademy.ccna.itn.com
 exit
+```
 
-! ===== DHCPv6 =====
-
+**DHCPv6:**
+```
 ipv6 dhcp pool STAFF-ST-V6
  address prefix 2001:C::/64
  dns-server 2001:4860:4860::8888
@@ -386,9 +420,10 @@ ipv6 dhcp pool GUESTS-ST-V6
  dns-server 2001:4860:4860::8888
  domain-name isepacademy.ccna.itn.com
 exit
+```
 
-! ===== Ativar DHCPv6 nas sub-interfaces (Gig0/1 = LAN) =====
-
+**Ativar DHCPv6 nas sub-interfaces (Gig0/1 = LAN):**
+```
 interface GigabitEthernet0/1.30
  ipv6 dhcp server STAFF-ST-V6
  ipv6 nd managed-config-flag
@@ -409,17 +444,18 @@ exit
 
 end
 copy running-config startup-config
+```
 
-#Parte 10 - Perform Security Configurations (Switch)
+---
 
-###Switch(SW1-St)
+## Parte 10 — Perform Security Configurations (Sw)
 
-#### a. Verificar se as portas não usadas estão em shutdown na Parte 5
+### Switch (SW1-St)
 
-show interfaces status | include disabled
+**a. Verificar portas desligadas** — feito na secção de verificação final.
 
-#### b. Port security nas portas de acesso Vlan 30 que é o que tem porta de acesso real
-
+**b. Port-security (VLAN 30):**
+```
 enable
 configure terminal
 interface range FastEthernet0/2 - 15
@@ -429,9 +465,10 @@ interface range FastEthernet0/2 - 15
  switchport port-security aging time 5
  switchport port-security aging type inactivity
 exit
+```
 
-#### c. DHCP Snooping
-
+**c. DHCP Snooping:**
+```
 ip dhcp snooping
 ip dhcp snooping vlan 30,50,60
 interface FastEthernet0/1
@@ -443,9 +480,10 @@ exit
 interface range FastEthernet0/21 - 22
  ip dhcp snooping limit rate 5
 exit
+```
 
-#### d. Dynamic ARP Inspection (vlan 30)
-
+**d. Dynamic ARP Inspection (VLAN 30):**
+```
 ip arp inspection vlan 30
 interface FastEthernet0/1
  ip arp inspection trust
@@ -453,33 +491,38 @@ exit
 interface range FastEthernet0/2 - 15
  ip arp inspection limit rate 5
 exit
+```
 
-#### e. PortFast
+**e. Portfast:**
+```
 spanning-tree portfast default
+interface FastEthernet0/1
+ spanning-tree portfast disable
+exit
+interface range FastEthernet0/21 - 22
+ spanning-tree portfast disable
+exit
+```
 
-#### f.BPDU Guard
-
+**f. BPDU Guard:**
+```
 interface range FastEthernet0/2 - 15
  spanning-tree bpduguard enable
 exit
 
-- Gravar
 end
 copy running-config startup-config
+```
 
-- Verificar
-show port-security interface FastEthernet0/2
-show ip dhcp snooping
-show ip arp inspection vlan 30
-show spanning-tree summary
-show running-config interface FastEthernet0/2
+---
 
+## Parte 11 — Configure Static Routes
 
-#Parte 11 - Configure Static Routes (Router)
-# Gig0/2 = WAN (liga ao SW0)
+> `Gig0/2` = WAN (liga ao SW0)
 
-#### a.  Rotas entre localidades (RT1-St)
+### a. Rotas entre localidades (RT1-St)
 
+```
 enable
 configure terminal
 
@@ -491,38 +534,104 @@ ip route 172.20.0.0 255.255.248.0 10.0.0.9 200
 ip route 172.20.8.0 255.255.252.0 10.0.0.9
 ip route 172.20.8.0 255.255.252.0 10.0.0.5 200
 
-! IPv6 — para Zagreb e Pula (next-hop = vizinho, sufixo próprio do vizinho: :1=Zagreb, :2=Pula, :3=Split)
-ipv6 route 2001:A::/61 GigabitEthernet0/2.103 FE80::103:1
-ipv6 route 2001:A::/61 GigabitEthernet0/2.203 FE80::203:2 200
-ipv6 route 2001:B::/61 GigabitEthernet0/2.203 FE80::203:2
-ipv6 route 2001:B::/61 GigabitEthernet0/2.103 FE80::103:1 200
+! IPv6 — para Zagreb (direta via Gig0/2.103 + backup via Pula)
+ipv6 route 2001:A::/61 GigabitEthernet0/2.103 FE80::103
+ipv6 route 2001:A::/61 GigabitEthernet0/2.203 FE80::203:1 200
 
-- Guardar
+! IPv6 — para Pula (direta via Gig0/2.203 + backup via Zagreb)
+ipv6 route 2001:B::/61 GigabitEthernet0/2.203 FE80::203:1
+ipv6 route 2001:B::/61 GigabitEthernet0/2.103 FE80::103 200
+
 end
 copy running-config startup-config
+```
 
+---
 
-Confirmar Router-St:
+## Parte 12 — Multi-Location Wireless Deployment (AP1-St)
 
-Parte 3 :
+### Reset e configuração inicial do AP1-St (consola)
+```
+Username: Cisco
+Password: Cisco
+> enable
+Password: Cisco
+# capwap ap ip address 172.20.13.226 255.255.255.248
+# capwap ap ip default-gateway 172.20.13.225
+# capwap ap controller ip address 172.20.7.6
+```
+
+### Passos na GUI da WLC (depois do AP1-St aparecer associado)
+- Confirmar que o AP1-St entra no AP Group **Split-APs**.
+- Associar as WLANs **WIRELESS-St** e **GUESTS-St** ao AP Group Split-APs (WLANs > Advanced > AP Groups > WLANs).
+- Selecionar o AP1-St: General > AP Mode = FlexConnect.
+- Advanced > associar ao AP Group correto (Split-APs).
+- High Availability > confirmar nome/endereço da WLC1-Zg.
+- Após reboot do AP: FlexConnect > VLAN Support > Native VLAN = 5. Aplicar.
+- VLAN Mapping: WIRELESS-St → VLAN 50, GUESTS-St → VLAN 60.
+
+---
+
+## Verificação Final (todas as partes)
+
+### Parte 2 — Clear Configs / SDM
+```
+show sdm prefer
+```
+
+### Parte 3 — Initial Configuration
+```
 show running-config | include hostname
 show running-config | include domain-name
 show ip ssh
+```
 
-Parte 6:
+### Parte 5 — VLANs, Trunks and Access Ports
+```
+show vlan brief
+show interfaces trunk
+show interfaces status
+```
+
+### Parte 6 — IPv4/IPv6 on Interfaces
+```
 show ip interface brief
 show ipv6 interface brief
+```
 
-Parte 8:
+### Parte 7 — STP
+```
+show spanning-tree summary
+```
+
+### Parte 8 — DHCPv4/DHCPv6
+```
 show ip dhcp pool
 show ipv6 dhcp pool
 show ipv6 dhcp interface
+```
 
-Parte 11:
+### Parte 10 — Security
+```
+show interfaces status | include disabled
+show port-security interface FastEthernet0/2
+show ip dhcp snooping
+show ip arp inspection vlan 30
+show spanning-tree summary
+show running-config interface FastEthernet0/2
+```
+
+### Parte 11 — Static Routes
+```
 show ip route static
 show ipv6 route static
+```
 
-Teste de conectividade:
+### Teste de conectividade (Part 13)
+```
 ping 172.20.13.234
 ping 10.0.0.5
 ping 10.0.0.9
+```
+
+---
