@@ -684,8 +684,8 @@ ip route 172.20.12.0 255.255.254.0 10.0.0.1 200
 
 ! ---- IPv6 (corrigido: FE80::102 -> FE80::102:1) ----
 ipv6 route 2001:A::/61 GigabitEthernet0/0/2.102 FE80::102:1
-ipv6 route 2001:A::/61 GigabitEthernet0/0/2.203 FE80::203:2 200
-ipv6 route 2001:C::/61 GigabitEthernet0/0/2.203 FE80::203:2
+ipv6 route 2001:A::/61 GigabitEthernet0/0/2.203 FE80::203:3 200
+ipv6 route 2001:C::/61 GigabitEthernet0/0/2.203 FE80::203:3
 ipv6 route 2001:C::/61 GigabitEthernet0/0/2.102 FE80::102:1 200
 
 end
