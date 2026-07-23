@@ -108,22 +108,22 @@ ip route 172.20.2.0 255.255.254.0 172.20.7.98 200
 ip route 172.20.6.0 255.255.255.0 172.20.7.102
 ip route 172.20.6.0 255.255.255.0 172.20.7.98 200
 
-ipv6 route 2001:A:0:7::/64 FE80::11
-ipv6 route 2001:A:0:7::/64 FE80::22 200
-ipv6 route 2001:A:0:5::/64 FE80::11
-ipv6 route 2001:A:0:5::/64 FE80::22 200
-ipv6 route 2001:A:0:6::/64 FE80::11
-ipv6 route 2001:A:0:6::/64 FE80::22 200
-ipv6 route 2001:A:0:2::/64 FE80::11
-ipv6 route 2001:A:0:2::/64 FE80::22 200
-ipv6 route 2001:A:0:3::/64 FE80::11
-ipv6 route 2001:A:0:3::/64 FE80::22 200
-ipv6 route 2001:A::/64 FE80::22
-ipv6 route 2001:A::/64 FE80::11 200
-ipv6 route 2001:A:0:1::/64 FE80::22
-ipv6 route 2001:A:0:1::/64 FE80::11 200
-ipv6 route 2001:A:0:4::/64 FE80::22
-ipv6 route 2001:A:0:4::/64 FE80::11 200
+ipv6 route 2001:A:0:7::/64 GigabitEthernet0/0 FE80::11
+ipv6 route 2001:A:0:7::/64 GigabitEthernet0/1 FE80::22 200
+ipv6 route 2001:A:0:5::/64 GigabitEthernet0/0 FE80::11
+ipv6 route 2001:A:0:5::/64 GigabitEthernet0/1 FE80::22 200
+ipv6 route 2001:A:0:6::/64 GigabitEthernet0/0 FE80::11
+ipv6 route 2001:A:0:6::/64 GigabitEthernet0/1 FE80::22 200
+ipv6 route 2001:A:0:2::/64 GigabitEthernet0/0 FE80::11
+ipv6 route 2001:A:0:2::/64 GigabitEthernet0/1 FE80::22 200
+ipv6 route 2001:A:0:3::/64 GigabitEthernet0/0 FE80::11
+ipv6 route 2001:A:0:3::/64 GigabitEthernet0/1 FE80::22 200
+ipv6 route 2001:A::/64 GigabitEthernet0/1 FE80::22
+ipv6 route 2001:A::/64 GigabitEthernet0/0 FE80::11 200
+ipv6 route 2001:A:0:1::/64 GigabitEthernet0/1 FE80::22
+ipv6 route 2001:A:0:1::/64 GigabitEthernet0/0 FE80::11 200
+ipv6 route 2001:A:0:4::/64 GigabitEthernet0/1 FE80::22
+ipv6 route 2001:A:0:4::/64 GigabitEthernet0/0 FE80::11 200
 
 end
 copy running-config startup-config
