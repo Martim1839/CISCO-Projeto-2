@@ -81,8 +81,8 @@ ip domain-name isepacademy.ccna.itn.com
 security passwords min-length 10
 service password-encryption
 enable secret classclass
-username cisco privilege 15 secret classclass
-crypto key generate rsa modulus 1024
+username cisco secret classclass
+crypto key generate rsa modulus 2048
 ip ssh version 2
 line console 0
  password classclass
@@ -120,8 +120,8 @@ hostname SW1-St
 ip domain-name isepacademy.ccna.itn.com
 service password-encryption
 enable secret classclass
-username cisco privilege 15 secret classclass
-crypto key generate rsa modulus 1024
+username cisco secret classclass
+crypto key generate rsa modulus 2048
 ip ssh version 2
 line console 0
  password classclass
@@ -572,7 +572,7 @@ ip route 172.20.8.0 255.255.252.0 10.0.0.9
 ip route 172.20.8.0 255.255.252.0 10.0.0.5 200
 
 ! IPv6 — para Zagreb (direta via Gig0/2.103 + backup via Pula)
-ipv6 route 2001:A::/61 GigabitEthernet0/2.103 FE80::103
+ipv6 route 2001:A::/61 GigabitEthernet0/2.103 FE80::103:1
 ipv6 route 2001:A::/61 GigabitEthernet0/2.203 FE80::203:1 200
 
 ! IPv6 — para Pula (direta via Gig0/2.203 + backup via Zagreb)
