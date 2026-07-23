@@ -1,5 +1,5 @@
 ! ==============================================================================
-! ZAGREB
+! ZAGREB 
 ! ==============================================================================
 
 
@@ -854,6 +854,7 @@ vlan 99
 exit
 
 interface range GigabitEthernet0/1 - 2
+ switchport trunk encapsulation dot1q
  switchport mode trunk
  switchport trunk native vlan 7
  switchport trunk allowed vlan except 99
@@ -1012,6 +1013,7 @@ interface range FastEthernet0/11-20
 exit
 
 interface range FastEthernet0/21-22
+ switchport trunk encapsulation dot1q
  switchport mode trunk
  switchport trunk native vlan 5
  switchport trunk allowed vlan 5,50,60
@@ -1019,6 +1021,7 @@ interface range FastEthernet0/21-22
 exit
 
 interface FastEthernet0/23
+ switchport trunk encapsulation dot1q
  switchport mode trunk
  switchport trunk native vlan 6
  switchport trunk allowed vlan 5,6,50,60
@@ -1027,6 +1030,7 @@ exit
 
 interface GigabitEthernet0/1
  description Trunk to MLS1-Zg
+ switchport trunk encapsulation dot1q
  switchport mode trunk
  switchport trunk native vlan 7
  switchport trunk allowed vlan except 99
@@ -1035,6 +1039,7 @@ exit
 
 interface GigabitEthernet0/2
  description Trunk to MLS2-Zg
+ switchport trunk encapsulation dot1q
  switchport mode trunk
  switchport trunk native vlan 7
  switchport trunk allowed vlan except 99
