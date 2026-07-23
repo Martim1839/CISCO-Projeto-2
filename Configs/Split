@@ -27,7 +27,7 @@
 | RT1-St | Gig0/1.30 | 2001:C::1 | /64 | Staff (Split) | N/A |
 | RT1-St | Gig0/1.50 | 2001:C:0:1::1 | /64 | Wireless-St | N/A |
 | RT1-St | Gig0/1.60 | 2001:C:0:5::1 | /64 | Guests-St | N/A |
-| RT1-St | Gig0/2.103 | link-local (`FE80::103`) | /64 | Connection to RT1-Zg | N/A |
+| RT1-St | Gig0/2.103 | link-local (`FE80::103:3`) | /64 | Connection to RT1-Zg | N/A |
 | RT1-St | Gig0/2.203 | link-local (`FE80::203:3`) | /64 | Connection to RT1-Pl | N/A |
 | RT1-St | Lo0 | 2001:C:0:2::1 | /64 | Multimedia (LAN simulada) | N/A |
 | RT1-St | Lo1 | 2001:C:0:3::1 | /64 | Design (LAN simulada) | N/A |
@@ -118,6 +118,7 @@ configure terminal
 no ip domain-lookup
 hostname SW1-St
 ip domain-name isepacademy.ccna.itn.com
+security passwords min-length 10
 service password-encryption
 enable secret classclass
 username cisco secret classclass
