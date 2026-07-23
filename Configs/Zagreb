@@ -1211,3 +1211,137 @@ ip arp inspection vlan 20,30
 
 end
 write memory
+
+enable
+configure terminal
+no ip domain-lookup
+hostname DHCP-SRV
+ip domain-name isepacademy.ccna.itn.com
+security passwords min-length 10
+service password-encryption
+enable secret classclass
+username cisco secret classclass
+crypto key generate rsa modulus 2048
+ip ssh version 2
+line console 0
+ password classclass
+ login
+exit
+line vty 0 15
+ transport input ssh
+ login local
+ exec-timeout 0 30
+exit
+login block-for 300 attempts 3 within 120
+banner motd #
+AVISO: Acesso restrito a utilizadores autorizados. Todas as ligacoes sao monitorizadas e registadas. Qualquer tentativa de acesso nao autorizado sera reportada as autoridades competentes.
+#
+
+ip host RT1-Zg 172.20.7.97
+ip host MLS1-Zg 172.20.7.98
+ip host MLS2-Zg 172.20.7.102
+ip host SW1-Zg 172.20.7.4
+
+
+! =========================================================
+! Interface de ligação ao SW1-Zg (VLAN Servers)
+! =========================================================
+ipv6 unicast-routing
+
+interface GigabitEthernet0/0
+ description Connection to SW1-Zg (Servers VLAN)
+ ip address 172.20.7.36 255.255.255.224
+ ipv6 address 2001:A:0:6::5/64
+ ipv6 address FE80::36 link-local
+ no shutdown
+exit
+
+! Gateway IPv4: vIP do HSRP (172.20.7.35) - resiliente, funciona com qualquer MLS ativo
+ip route 0.0.0.0 0.0.0.0 172.20.7.35
+
+! Gateway IPv6: sem HSRP em IPv6, aponta fixo para o MLS1-Zg (primário desta VLAN)
+ipv6 route ::/0 2001:A:0:6::1
+
+
+! =========================================================
+! Part 8a — DHCPv4 (Administration, Staff, VoIP, Wireless-Zg, Guests-Zg)
+! =========================================================
+
+ip dhcp excluded-address 172.20.4.1 172.20.4.3
+ip dhcp excluded-address 172.20.5.1 172.20.5.3
+ip dhcp excluded-address 172.20.0.1 172.20.0.3
+ip dhcp excluded-address 172.20.2.1 172.20.2.3
+ip dhcp excluded-address 172.20.6.1 172.20.6.3
+
+ip dhcp pool ADMINISTRATION-ZG
+ network 172.20.4.0 255.255.255.0
+ default-router 172.20.4.3
+ dns-server 172.20.7.36
+ domain-name isepacademy.ccna.itn.com
+exit
+
+ip dhcp pool STAFF-ZG
+ network 172.20.5.0 255.255.255.0
+ default-router 172.20.5.3
+ dns-server 172.20.7.36
+ domain-name isepacademy.ccna.itn.com
+exit
+
+ip dhcp pool VOIP-ZG
+ network 172.20.0.0 255.255.254.0
+ default-router 172.20.0.3
+ dns-server 172.20.7.36
+ domain-name isepacademy.ccna.itn.com
+exit
+
+ip dhcp pool WIRELESS-ZG
+ network 172.20.2.0 255.255.254.0
+ default-router 172.20.2.3
+ dns-server 172.20.7.36
+ domain-name isepacademy.ccna.itn.com
+exit
+
+ip dhcp pool GUESTS-ZG
+ network 172.20.6.0 255.255.255.0
+ default-router 172.20.6.3
+ dns-server 172.20.7.36
+ domain-name isepacademy.ccna.itn.com
+exit
+
+
+! =========================================================
+! Part 8a — DHCPv6 (stateful)
+! =========================================================
+
+ipv6 dhcp pool ADMINISTRATION-ZG-V6
+ address prefix 2001:A:0:2::/64
+ dns-server 2001:4860:4860::8888
+ domain-name isepacademy.ccna.itn.com
+exit
+
+ipv6 dhcp pool STAFF-ZG-V6
+ address prefix 2001:A:0:3::/64
+ dns-server 2001:4860:4860::8888
+ domain-name isepacademy.ccna.itn.com
+exit
+
+ipv6 dhcp pool VOIP-ZG-V6
+ address prefix 2001:A::/64
+ dns-server 2001:4860:4860::8888
+ domain-name isepacademy.ccna.itn.com
+exit
+
+ipv6 dhcp pool WIRELESS-ZG-V6
+ address prefix 2001:A:0:1::/64
+ dns-server 2001:4860:4860::8888
+ domain-name isepacademy.ccna.itn.com
+exit
+
+ipv6 dhcp pool GUESTS-ZG-V6
+ address prefix 2001:A:0:4::/64
+ dns-server 2001:4860:4860::8888
+ domain-name isepacademy.ccna.itn.com
+exit
+
+end
+copy running-config startup-config
