@@ -932,6 +932,7 @@ exit
 
 interface range FastEthernet0/1 - 20
  ip dhcp snooping limit rate 5
+ ip arp inspection limit rate 5
 exit
 
 ip arp inspection vlan 10,20,30
