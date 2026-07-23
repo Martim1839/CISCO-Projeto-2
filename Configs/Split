@@ -577,7 +577,7 @@ ipv6 route 2001:A::/61 GigabitEthernet0/2.203 FE80::203:1 200
 
 ! IPv6 — para Pula (direta via Gig0/2.203 + backup via Zagreb)
 ipv6 route 2001:B::/61 GigabitEthernet0/2.203 FE80::203:1
-ipv6 route 2001:B::/61 GigabitEthernet0/2.103 FE80::103 200
+ipv6 route 2001:B::/61 GigabitEthernet0/2.103 FE80::103:1 200
 
 end
 copy running-config startup-config
